@@ -23,7 +23,7 @@ pdoom 原片（同一套引擎在云端渲染的 4 帧，用来对照质感）�
 | **下一台也亮着** | **↻** |
 | ![](docs/img/deep_next.jpg) | ![](docs/img/deep_loop.jpg) |
 
-运动样片（无声、30fps、无动态模糊）：`out/clips/` 里的 `thumb_test.mp4`、`deep_test.mp4`（不进 git，单独发）。
+运动样片（无声、30fps、单采样无动态模糊，云端约 8 秒/帧）：`thumb` 4.5 秒、`deep` 8.8 秒，已在对话里单独发过（`out/` 不进 git）。
 
 ## 做了什么（文件）
 
