@@ -1,0 +1,29 @@
+import { hexToLinear } from './util';
+
+// EP36《六秒》: ink, bone, and one signal colour (the playhead red). One rare accent: the like-pink,
+// only for 「いいねしてるよ」 in the final chorus (key kept as `acid` so the engine's GLSL constant C_ACID still exists).
+export const HEX = {
+  ink: '#0A0A0B', // background black (slightly warm)
+  ink2: '#151517', // raised black (panels, paper-in-the-dark)
+  graphite: '#5E5B57', // dim lines, secondary text
+  ash: '#9C978F', // mid grey
+  bone: '#EEE9DF', // paper white, primary text
+  signal: '#FF3B2F', // playhead red: the playhead, the word being sung, timecodes (the only thing that glows)
+  ember: '#FF8A5B', // hot core of the red
+  blood: '#B3122A', // shadows of the red
+  acid: '#FF6FA8', // like-pink: ~2 s in the final chorus, nowhere else
+} as const;
+
+export type PaletteKey = keyof typeof HEX;
+
+/** Linear RGB triplets for GL uniforms. */
+export const LIN: Record<PaletteKey, [number, number, number]> = Object.fromEntries(
+  Object.entries(HEX).map(([k, v]) => [k, hexToLinear(v)]),
+) as Record<PaletteKey, [number, number, number]>;
+
+/** CSS rgba() for Canvas2D. */
+export function rgba(key: PaletteKey | string, a = 1): string {
+  const hex = (HEX as Record<string, string>)[key] ?? key;
+  const n = parseInt(hex.replace('#', ''), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}

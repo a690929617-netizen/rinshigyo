@@ -1,0 +1,4 @@
+out/
+app/node_modules
+# Japanese fonts (~30 MB): fetch with tools/get_fonts.sh
+app/public/fonts/jp/*.ttf
