@@ -225,6 +225,8 @@ section { scroll-margin-top: var(--head); }
   content: ""; position: absolute; left: -2px; top: 0; width: 5px; height: 5px; border-radius: 50%;
   background: var(--signal); box-shadow: 0 0 8px var(--signal);
 }
+.avail { display: inline-flex; align-items: center; gap: 9px; color: var(--bone); }
+.avail i { width: 6px; height: 6px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 8px var(--glow); }
 .geo { margin-left: auto !important; }
 @media (max-width: 640px) {
   .name { flex-direction: column; align-items: flex-start; gap: .02em; font-size: 26.5vw; }
@@ -520,7 +522,7 @@ section { scroll-margin-top: var(--head); }
   .is-ready .hero-foot { animation: fadeIn 1s 1.9s both; }
   .is-ready .core { animation: fadeIn 1s 2s both; }
   .shake { animation: shake .38s linear; }
-  .rec, .live { animation: blink 1.6s steps(1) infinite; }
+  .rec, .live, .avail i { animation: blink 1.6s steps(1) infinite; }
   .cue-line::after { animation: drip 1.9s cubic-bezier(.6, 0, .3, 1) infinite; }
   .drop { animation: dropIn .45s cubic-bezier(.3, 1.5, .5, 1) both, dropOut .9s ease-in 1.7s forwards; }
   .screen.scan::after { animation: scanDown .7s cubic-bezier(.7, 0, .2, 1); }
@@ -642,6 +644,7 @@ section { scroll-margin-top: var(--head); }
     <div class="hero-foot mono">
       <a class="cue" href="#statement"><span class="cue-line" aria-hidden="true"></span><span class="t"><span lang="zh-CN">向下滚动</span><span lang="ja">スクロール</span><span lang="en">Scroll</span></span></a>
       <p class="hint t" aria-hidden="true"><span lang="zh-CN">点一下，盖个章</span><span lang="ja">タップ／クリックで押印</span><span lang="en">Tap or click to stamp</span></p>
+      <p class="avail"><i aria-hidden="true"></i><span class="t"><span lang="zh-CN">接受合作</span><span lang="ja">ご依頼受付中</span><span lang="en">Open for projects</span></span></p>
       <p class="geo">CHIBA · JP<span class="coords"> — 35.61°N 140.11°E</span> — <span id="clock">--:--:--</span> JST</p>
     </div>
   </div>
@@ -853,6 +856,8 @@ section { scroll-margin-top: var(--head); }
         <dd class="t"><span lang="zh-CN">社会福祉 · 大三</span><span lang="ja">社会福祉・3年</span><span lang="en">Social welfare, 3rd year</span></dd>
         <dt>SPEAKS</dt>
         <dd>中文 · <span lang="ja">日本語</span></dd>
+        <dt>TOOLS</dt>
+        <dd>Claude Code · WebGL · TypeScript · FFmpeg · <span class="t"><span lang="zh-CN">即梦</span><span lang="ja">即梦</span><span lang="en">Jimeng</span></span></dd>
         <dt>INTO</dt>
         <dd class="t"><span lang="zh-CN">AI 视频 · AI 资讯 · 歌词动效</span><span lang="ja">AI映像・AIニュース・リリックモーション</span><span lang="en">AI video · AI news · lyric motion</span></dd>
         <dt>NOW</dt>
