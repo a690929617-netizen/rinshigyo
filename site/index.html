@@ -146,7 +146,7 @@ section { scroll-margin-top: var(--head); }
 .lang button[lang="en"] { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; }
 .lang button:hover { color: var(--bone); }
 .lang button[aria-pressed="true"] { background: var(--bone); color: var(--ink); }
-@media (max-width: 720px) { .nav { display: none; } .lang { margin-left: auto; } }
+@media (max-width: 720px) { .top-in { gap: 16px; } .nav a:not([href="#contact"]) { display: none; } }
 
 /* ---------- hero ---------- */
 .hero { position: relative; isolation: isolate; display: flex; min-height: 100vh; min-height: 100svh; overflow: hidden; }
@@ -206,6 +206,14 @@ section { scroll-margin-top: var(--head); }
 .hero-tag { margin: 0; max-width: 24em; font-size: clamp(20px, 1.6vw + 10px, 34px); line-height: 1.45; text-wrap: balance; }
 .hero-tag [lang="en"] { font-style: italic; font-size: 1.1em; }
 .hero-sub { margin: -6px 0 0; font-size: 14px; letter-spacing: .04em; color: var(--ash); }
+.cta {
+  display: inline-flex; align-items: center; gap: 12px; margin-top: 4px; padding: 11px 18px 11px 15px;
+  border: 1px solid var(--line-2); background: rgba(10, 10, 11, .5); text-decoration: none;
+  font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); transition: border-color .3s, background-color .3s;
+}
+.cta:hover { border-color: var(--signal); background: rgba(255, 59, 47, .1); }
+.cta-play { width: 0; height: 0; border-style: solid; border-width: 5px 0 5px 9px; border-color: transparent transparent transparent var(--signal); filter: drop-shadow(0 0 4px var(--glow)); }
 .hero-foot {
   display: flex; flex-wrap: wrap; align-items: center; gap: 14px 36px;
   font-size: 11px; letter-spacing: .12em; color: var(--ash);
@@ -352,6 +360,34 @@ section { scroll-margin-top: var(--head); }
   .scrub-stick { position: relative; height: auto; padding-block: 40px; }
 }
 
+/* motion test loops */
+.motion { padding-block: clamp(72px, 9vw, 130px) 0; }
+.motion .eyebrow { margin-bottom: clamp(20px, 2.6vw, 32px); }
+.reels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(28px, 2.6vw, 40px) clamp(16px, 2.4vw, 36px); }
+.reel { margin: 0; display: grid; align-content: start; gap: 12px; }
+.reel-screen { position: relative; overflow: hidden; aspect-ratio: 16 / 9; max-width: 100%; background: var(--ink-2); outline: 1px solid var(--line); cursor: pointer; }
+.reel-v { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.reel-btn {
+  position: absolute; z-index: 2; top: 12px; right: 12px; display: grid; place-items: center; width: 38px; height: 38px; padding: 0;
+  border: 1px solid var(--line-2); border-radius: 50%; background: rgba(10, 10, 11, .62); cursor: pointer;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); transition: opacity .3s, border-color .3s;
+}
+.reel-btn svg { width: 13px; height: 13px; fill: var(--bone); }
+.reel-btn .i-pause, .reel.is-playing .reel-btn .i-play { display: none; }
+.reel.is-playing .reel-btn .i-pause { display: block; }
+.reel.is-playing .reel-btn { opacity: 0; }
+.reel-screen:hover .reel-btn, .reel-btn:focus-visible { opacity: 1; border-color: var(--signal); }
+.reel-bar { position: relative; display: block; height: 1px; background: var(--line-2); }
+.reel-fill { position: absolute; inset: 0; background: var(--signal); box-shadow: 0 0 6px var(--glow); transform-origin: 0 50%; transform: scaleX(var(--p, 0)); }
+.reel-head { position: absolute; top: 0; left: calc(var(--p, 0) * 100%); width: 7px; height: 7px; margin: -3px 0 0 -3.5px; border-radius: 50%; background: var(--hot); box-shadow: 0 0 0 2px var(--signal), 0 0 12px 2px var(--glow); }
+.reel figcaption { display: grid; gap: 6px; }
+.reel figcaption p { margin: 0; }
+.reel-cap { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11px; letter-spacing: .06em; color: var(--ash); }
+.reel-cap b { font-weight: 500; color: var(--bone); }
+.reel-tc { margin-left: auto; color: var(--signal); font-variant-numeric: tabular-nums; }
+.reel-txt { font-size: 15px; }
+@media (max-width: 860px) { .reels { grid-template-columns: minmax(0, 1fr); } }
+
 /* ---------- method ---------- */
 .method { padding-block: clamp(110px, 14vw, 200px); }
 .method-h { margin: 0 0 clamp(40px, 5vw, 72px); max-width: 16em; font-size: clamp(30px, 3vw + 12px, 60px); font-weight: 400; line-height: 1.22; text-wrap: balance; }
@@ -470,7 +506,7 @@ section { scroll-margin-top: var(--head); }
 
 /* ---------- motion ---------- */
 .js:not(.is-ready) .hero-eyebrow, .js:not(.is-ready) .kanji > span, .js:not(.is-ready) .name .stamp,
-.js:not(.is-ready) .hero-tag, .js:not(.is-ready) .hero-sub, .js:not(.is-ready) .hud,
+.js:not(.is-ready) .hero-tag, .js:not(.is-ready) .hero-sub, .js:not(.is-ready) .cta, .js:not(.is-ready) .hud,
 .js:not(.is-ready) .hero-foot, .js:not(.is-ready) .core { opacity: 0; }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -479,6 +515,7 @@ section { scroll-margin-top: var(--head); }
   .is-ready .name .stamp { animation: stampIn .55s cubic-bezier(.3, 1.45, .5, 1) 1.02s both; }
   .is-ready .hero-tag { animation: fadeUp .9s 1.45s both; }
   .is-ready .hero-sub { animation: fadeUp .9s 1.6s both; }
+  .is-ready .cta { animation: fadeUp .9s 1.75s both; }
   .is-ready .hud { animation: fadeIn 1.2s .5s both; }
   .is-ready .hero-foot { animation: fadeIn 1s 1.9s both; }
   .is-ready .core { animation: fadeIn 1s 2s both; }
@@ -600,6 +637,7 @@ section { scroll-margin-top: var(--head); }
         <span lang="ja">千葉で社会福祉を学ぶ、中国からの留学生。</span>
         <span lang="en">A student from China, studying social welfare in Chiba.</span>
       </p>
+      <a class="cta mono" href="#motion"><i class="cta-play" aria-hidden="true"></i><span class="t"><span lang="zh-CN">看 13 秒动态样片</span><span lang="ja">13秒の動くテストを見る</span><span lang="en">Watch the 13 s motion test</span></span></a>
     </div>
     <div class="hero-foot mono">
       <a class="cue" href="#statement"><span class="cue-line" aria-hidden="true"></span><span class="t"><span lang="zh-CN">向下滚动</span><span lang="ja">スクロール</span><span lang="en">Scroll</span></span></a>
@@ -666,12 +704,12 @@ section { scroll-margin-top: var(--head); }
         <div class="screen-bar mono"><span><b>EP36</b> · S0 TEST PLATES</span><span id="plN">01 / 06</span></div>
         <div class="screen-wrap">
           <div class="screen">
-            <img class="pl is-on" src="assets/ep36-01-approach.jpg" alt="A 3D engraved fingerprint coming down toward the glass, with the lyric 指紋が近づく and the red playhead at 3.7 seconds" width="1280" height="720" decoding="async">
-            <img class="pl" src="assets/ep36-02-stop.jpg" alt="The fingerprint frozen 5.68 mm above the glass under a red ストップ stamp" width="1280" height="720" loading="lazy" decoding="async">
-            <img class="pl" src="assets/ep36-03-lattice.jpg" alt="An endless lattice of phones drawn in engraved steel lines, with the lyric 百万本" width="1280" height="720" loading="lazy" decoding="async">
-            <img class="pl" src="assets/ep36-04-lit.jpg" alt="One lit phone screen among a million, labelled No. 0,000,001" width="1280" height="720" loading="lazy" decoding="async">
-            <img class="pl" src="assets/ep36-05-next.jpg" alt="Two lit screens side by side showing the same card, with the lyric 次へ行" width="1280" height="720" loading="lazy" decoding="async">
-            <img class="pl" src="assets/ep36-06-loop.jpg" alt="A red loop drawn around the screens by the playhead, with the lyric ループして" width="1280" height="720" loading="lazy" decoding="async">
+            <img class="pl is-on" src="assets/ep36-01-approach.webp" alt="A 3D engraved fingerprint coming down toward the glass, with the lyric 指紋が近づく and the red playhead at 3.7 seconds" width="1280" height="720" decoding="async">
+            <img class="pl" src="assets/ep36-02-stop.webp" alt="The fingerprint frozen 5.68 mm above the glass under a red ストップ stamp" width="1280" height="720" loading="lazy" decoding="async">
+            <img class="pl" src="assets/ep36-03-lattice.webp" alt="An endless lattice of phones drawn in engraved steel lines, with the lyric 百万本" width="1280" height="720" loading="lazy" decoding="async">
+            <img class="pl" src="assets/ep36-04-lit.webp" alt="One lit phone screen among a million, labelled No. 0,000,001" width="1280" height="720" loading="lazy" decoding="async">
+            <img class="pl" src="assets/ep36-05-next.webp" alt="Two lit screens side by side showing the same card, with the lyric 次へ行" width="1280" height="720" loading="lazy" decoding="async">
+            <img class="pl" src="assets/ep36-06-loop.webp" alt="A red loop drawn around the screens by the playhead, with the lyric ループして" width="1280" height="720" loading="lazy" decoding="async">
           </div>
           <i class="marks" aria-hidden="true"></i>
         </div>
@@ -714,15 +752,44 @@ section { scroll-margin-top: var(--head); }
           </div>
         </div>
         <div class="strip" role="group" aria-label="Plates">
-          <button type="button" class="is-on" aria-pressed="true" aria-label="Plate 1" style="background-image:url(assets/ep36-01-approach.jpg)"><span>1</span></button>
-          <button type="button" aria-pressed="false" aria-label="Plate 2" style="background-image:url(assets/ep36-02-stop.jpg)"><span>2</span></button>
-          <button type="button" aria-pressed="false" aria-label="Plate 3" style="background-image:url(assets/ep36-03-lattice.jpg)"><span>3</span></button>
-          <button type="button" aria-pressed="false" aria-label="Plate 4" style="background-image:url(assets/ep36-04-lit.jpg)"><span>4</span></button>
-          <button type="button" aria-pressed="false" aria-label="Plate 5" style="background-image:url(assets/ep36-05-next.jpg)"><span>5</span></button>
-          <button type="button" aria-pressed="false" aria-label="Plate 6" style="background-image:url(assets/ep36-06-loop.jpg)"><span>6</span></button>
+          <button type="button" class="is-on" aria-pressed="true" aria-label="Plate 1" style="background-image:url(assets/ep36-01-approach.webp)"><span>1</span></button>
+          <button type="button" aria-pressed="false" aria-label="Plate 2" style="background-image:url(assets/ep36-02-stop.webp)"><span>2</span></button>
+          <button type="button" aria-pressed="false" aria-label="Plate 3" style="background-image:url(assets/ep36-03-lattice.webp)"><span>3</span></button>
+          <button type="button" aria-pressed="false" aria-label="Plate 4" style="background-image:url(assets/ep36-04-lit.webp)"><span>4</span></button>
+          <button type="button" aria-pressed="false" aria-label="Plate 5" style="background-image:url(assets/ep36-05-next.webp)"><span>5</span></button>
+          <button type="button" aria-pressed="false" aria-label="Plate 6" style="background-image:url(assets/ep36-06-loop.webp)"><span>6</span></button>
         </div>
         <p class="scrub-hint mono t"><span lang="zh-CN">滚动页面，逐帧播放</span><span lang="ja">スクロールでコマ送り</span><span lang="en">Scroll to step through</span></p>
       </div>
+    </div>
+  </div>
+
+  <!-- 动态样片：用 ep36-lab 的引擎在云端实际渲染的两段（无声，30 fps） -->
+  <div class="motion wrap" id="motion" data-tl="PLATE I — MOTION TEST">
+    <p class="eyebrow mono"><span>Motion test</span><span class="eyebrow-r">30 FPS · SILENT · CLOUD RENDER</span></p>
+    <div class="reels">
+      <figure class="reel rv">
+        <div class="reel-screen">
+          <video class="reel-v" poster="assets/ep36-thumb-poster.webp" width="1280" height="720" muted loop playsinline preload="none" aria-label="EP36 motion test: the thumb comes down and stops"><source src="assets/ep36-thumb.mp4" type="video/mp4"><source src="assets/ep36-thumb.webm" type="video/webm"></video>
+          <button type="button" class="reel-btn" aria-label="Play or pause"><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9.5-5.5z"/></svg><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z"/></svg></button>
+        </div>
+        <i class="reel-bar" aria-hidden="true"><i class="reel-fill"></i><i class="reel-head"></i></i>
+        <figcaption>
+          <p class="reel-cap mono"><b>FIG. 04</b><span lang="ja">指紋 — ストップ</span><span class="reel-tc">00:00.00 / 00:04.43</span></p>
+          <p class="reel-txt t"><span lang="zh-CN">拇指压下来，在离屏幕几毫米的地方急停。</span><span lang="ja">親指が近づき、画面の数ミリ手前でストップ。</span><span lang="en">The thumb comes down and stops a few millimetres from the glass.</span></p>
+        </figcaption>
+      </figure>
+      <figure class="reel rv">
+        <div class="reel-screen">
+          <video class="reel-v" poster="assets/ep36-deep-poster.webp" width="1280" height="720" muted loop playsinline preload="none" aria-label="EP36 motion test: one lit screen among a million phones, then the loop"><source src="assets/ep36-deep.mp4" type="video/mp4"><source src="assets/ep36-deep.webm" type="video/webm"></video>
+          <button type="button" class="reel-btn" aria-label="Play or pause"><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9.5-5.5z"/></svg><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z"/></svg></button>
+        </div>
+        <i class="reel-bar" aria-hidden="true"><i class="reel-fill"></i><i class="reel-head"></i></i>
+        <figcaption>
+          <p class="reel-cap mono"><b>FIG. 11</b><span lang="ja">動画の奥 — ループ</span><span class="reel-tc">00:00.00 / 00:08.83</span></p>
+          <p class="reel-txt t"><span lang="zh-CN">一百万台手机里只亮着一台，然后开始循环。</span><span lang="ja">百万台のなかで一台だけが光り、ループがはじまる。</span><span lang="en">One lit screen among a million phones, and then the loop.</span></p>
+        </figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -1280,6 +1347,35 @@ void main() {
     window.scrollTo({ top: top + total * (i + 0.5) / N, behavior: reduce ? 'auto' : 'smooth' });
   }));
 
+  /* ---------- motion test loops: play while on screen ---------- */
+  const fmtTime = s => pad(Math.floor(s / 60)) + ':' + pad(Math.floor(s % 60)) + '.' + pad(Math.floor((s % 1) * 100));
+  const reels = $$('.reel').map(el => ({ el, v: $('video', el), tc: $('.reel-tc', el), held: false, raf: 0 }));
+  function paintReel(r) {
+    const d = r.v.duration;
+    if (!d || !isFinite(d)) return;
+    r.el.style.setProperty('--p', (r.v.currentTime / d).toFixed(4));
+    r.tc.textContent = fmtTime(r.v.currentTime) + ' / ' + fmtTime(d);
+  }
+  reels.forEach(r => {
+    const step = () => { paintReel(r); r.raf = r.v.paused ? 0 : requestAnimationFrame(step); };
+    r.v.addEventListener('play', () => { r.el.classList.add('is-playing'); if (!r.raf) r.raf = requestAnimationFrame(step); });
+    r.v.addEventListener('pause', () => { r.el.classList.remove('is-playing'); paintReel(r); });
+    r.v.addEventListener('loadedmetadata', () => paintReel(r));
+    // a pause the viewer chose sticks; leaving the screen only pauses until it comes back
+    $('.reel-screen', r.el).addEventListener('click', () => {
+      if (r.v.paused) { r.held = false; r.v.play().catch(() => {}); }
+      else { r.held = true; r.v.pause(); }
+    });
+  });
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      const r = reels.find(x => x.el === e.target);
+      if (e.isIntersecting) { if (!r.held) r.v.play().catch(() => {}); }
+      else if (!r.v.paused) r.v.pause();
+    }), { threshold: 0.35 });
+    reels.forEach(r => io.observe(r.el));
+  }
+
   /* ---------- the page is six seconds long ---------- */
   const tl = $('#tl'), track = $('#track'), tc = $('#tc'), tlLabel = $('#tlLabel');
   const marks = $$('[data-tl]');
@@ -1411,6 +1507,10 @@ void main() {
   applyLang(TAGS[root.dataset.lang] ? root.dataset.lang : 'zh');
   layoutHero();
   wake();
+
+  // for whoever opens the console
+  console.log('%c半額%c水電魚', 'font:24px "Dela Gothic One",sans-serif;color:#FF3B2F;border:3px double #FF3B2F;padding:2px 6px', 'font:600 24px "Zen Old Mincho",serif;color:#EEE9DF;background:#0A0A0B;padding:4px 10px');
+  console.log('这个网站是用代码和 AI 一起写的。 / このサイトはコードとAIで作りました。 / Built in code, with AI.');
 })();
 </script>
 </body>

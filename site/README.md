@@ -1,6 +1,6 @@
 # 半額水電魚 · 个人网站
 
-纯静态网页，只有两样东西：`index.html`（整个网站都在这一个文件里），和 `assets/` 里 6 张 EP36《六秒》的测试图版。不用安装任何东西。
+纯静态网页，只有两样东西：`index.html`（整个网站都在这一个文件里），和 `assets/` 里 EP36《六秒》的 6 张测试图版、2 段动态样片。不用安装任何东西。
 
 ## 预览
 
@@ -28,7 +28,23 @@
 
 ## 换作品图
 
-图片在 `assets/`，尺寸 1280×720。用同名文件替换就行。要加新的一帧，就把 `<img class="pl">`、`<div class="cap">` 和下面缩略图条里的 `<button>` 各复制一份。
+图片在 `assets/`，1280×720 的 WebP（比 JPG 小四成左右）。用同名文件替换就行；手上只有 JPG/PNG 的话，把 `index.html` 里对应的文件名后缀改掉也能用。要加新的一帧，就把 `<img class="pl">`、`<div class="cap">` 和下面缩略图条里的 `<button>` 各复制一份。
+
+## 动态样片是怎么来的
+
+`assets/ep36-thumb.mp4` 和 `assets/ep36-deep.mp4` 是用仓库里 `ep36-lab` 的引擎在云端渲染的（无声、30 fps，节拍是占位数据）。换成真实对齐数据后，可以照这几步重渲：
+
+```bash
+cd ep36-lab && bash tools/get_fonts.sh && cd app && bun install
+bun scripts/render.ts video --from 27.7058 --to 32.1176 --fps 30 --noaudio --only thumb --out ../out/thumb.mp4
+bun scripts/render.ts video --from 104.4706 --to 113.2941 --fps 30 --noaudio --only deep --out ../out/deep.mp4
+```
+
+起止时间是 `timeline.ts` 里 `thumb`、`deep` 两个场景的窗口，换了数据要跟着改。云端没有显卡时加 `CHROME_PATH=/path/to/chromium`。渲出来是 1920×1080，网站用的是缩到 1280 宽再压缩的版本：
+
+```bash
+ffmpeg -i ../out/thumb.mp4 -vf "scale=1280:-2:flags=lanczos" -c:v libx264 -preset slow -crf 24 -pix_fmt yuv420p -an -movflags +faststart ../../site/assets/ep36-thumb.mp4
+```
 
 ## 分享时指定语言
 
@@ -46,6 +62,7 @@
 | 首屏 | 实时渲染的雕版指纹（WebGL），鼠标是放大镜；名字逐字砸下来，「半額」章最后盖上。点一下画面会再盖一个章 |
 | 六秒の壁 | 一句话，随滚动一个字一个字亮起来 |
 | 作品 | EP36《六秒》：往下滚动，6 张图版像视频一样逐帧切换，配歌词和翻译 |
+| 动态样片 | 两段引擎实拍的循环视频（4.4 秒 + 8.8 秒），滚到就静音自动播放，点一下暂停；首屏的「看 13 秒动态样片」按钮直接跳到这里 |
 | 做法 | 声・描・刻・放 四道工序 |
 | 关于 | 标本卡（SPECIMEN No. 0,000,001） |
 | 联系 | 联系方式 + 「LOOP」按钮回到开头 |
