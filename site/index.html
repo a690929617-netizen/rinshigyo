@@ -1,0 +1,1417 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>半額水電魚</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="半額水電魚：用代码和 AI，一帧一帧给歌做 MV。A student from China in Chiba, Japan, making music videos in code with AI.">
+<meta name="theme-color" content="#0A0A0B">
+<meta property="og:type" content="website">
+<meta property="og:title" content="半額水電魚">
+<meta property="og:description" content="用代码和 AI，一帧一帧给歌做 MV。コードとAIで、歌にMVを一コマずつ刻む。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230A0A0B'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FF3B2F'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;900&family=Zen+Old+Mincho:wght@400;600;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&text=%E5%8D%8A%E9%A1%8D%E3%82%B9%E3%83%88%E3%83%83%E3%83%97%E5%86%8D%E7%94%9F%E4%B8%AD&display=swap">
+<script>
+/* Language before first paint: #zh / #ja / #en in the link, then the saved choice, then the browser language. */
+(function () {
+  var d = document.documentElement, ok = { zh: 1, ja: 1, en: 1 }, l = location.hash.slice(1);
+  if (!ok[l]) { try { l = localStorage.getItem('hsg-lang'); } catch (e) { l = null; } }
+  if (!ok[l]) {
+    var n = String((navigator.languages && navigator.languages[0]) || navigator.language || '').toLowerCase();
+    l = n.indexOf('ja') === 0 ? 'ja' : n.indexOf('zh') === 0 ? 'zh' : 'en';
+  }
+  d.setAttribute('data-lang', l);
+  d.setAttribute('lang', l === 'zh' ? 'zh-CN' : l);
+  d.classList.add('js');
+})();
+</script>
+<style>
+/* Layout: one dark print room. Full-bleed bands, content inside a 16–56px gutter on a 12-column grid,
+   specimen annotations in mono at the edges, and a six-second timeline pinned to the bottom. */
+:root {
+  /* colour: the EP36 palette (ep36-lab/app/src/engine/palette.ts) */
+  --ink: #0A0A0B;
+  --ink-2: #151517;
+  --graphite: #5E5B57;
+  --ash: #9C978F;
+  --bone: #EEE9DF;
+  --signal: #FF3B2F;
+  --hot: #FFF4E8;
+  --line: rgba(238, 233, 223, .13);
+  --line-2: rgba(238, 233, 223, .3);
+  --glow: rgba(255, 59, 47, .55);
+
+  /* type: mincho / song / garamond for display, system gothic for reading, Plex Mono for annotations */
+  --serif-ja: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", YuMincho, "Noto Serif JP", serif;
+  --serif-zh: "Noto Serif SC", "Songti SC", STSong, SimSun, serif;
+  --serif-en: "Cormorant Garamond", Garamond, Georgia, serif;
+  --sans-ja: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", YuGothic, Meiryo, sans-serif;
+  --sans-zh: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --sans-en: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Hiragino Sans", "Noto Sans JP", "PingFang SC", "Microsoft YaHei", monospace;
+  --stamp: "Dela Gothic One", "Hiragino Sans", "Noto Sans JP", sans-serif;
+
+  --gx: clamp(16px, 4vw, 56px);
+  --head: 60px;
+  --tlh: 48px;
+  color-scheme: dark;
+}
+[lang|="zh"] { --sans: var(--sans-zh); --serif: var(--serif-zh); }
+[lang="ja"] { --sans: var(--sans-ja); --serif: var(--serif-ja); }
+[lang="en"] { --sans: var(--sans-en); --serif: var(--serif-en); }
+
+/* Every .t holds one child per language; only the active one shows. */
+html:not([data-lang]) .t > [lang]:not([lang|="zh"]),
+[data-lang="zh"] .t > [lang]:not([lang|="zh"]),
+[data-lang="ja"] .t > [lang]:not([lang="ja"]),
+[data-lang="en"] .t > [lang]:not([lang="en"]) { display: none !important; }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--ink); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--bone);
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+body, [lang] { font-family: var(--sans); }
+.disp, .disp [lang] { font-family: var(--serif); }
+.mono, .mono [lang] { font-family: var(--mono); }
+:lang(ja) { word-break: auto-phrase; }
+main { overflow-x: clip; }
+img { display: block; max-width: 100%; }
+i { font-style: normal; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+::selection { background: var(--signal); color: var(--ink); }
+:focus-visible { outline: 1px solid var(--signal); outline-offset: 3px; }
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.red { color: var(--signal); }
+section { scroll-margin-top: var(--head); }
+
+.wrap {
+  width: 100%;
+  max-width: 1520px;
+  margin-inline: auto;
+  padding-left: max(var(--gx), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gx), env(safe-area-inset-right, 0px));
+}
+
+/* ---------- header ---------- */
+.top {
+  position: fixed; z-index: 50; top: 0; left: 0; right: 0;
+  padding-top: env(safe-area-inset-top, 0px);
+  border-bottom: 1px solid transparent;
+  transition: background-color .4s, border-color .4s;
+}
+.top::before {
+  content: ""; position: absolute; z-index: -1; inset: 0 0 -36px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(10, 10, 11, .9), rgba(10, 10, 11, .6) 55%, rgba(10, 10, 11, 0));
+  transition: opacity .4s;
+}
+.top.is-solid::before { opacity: 0; }
+.top.is-solid {
+  background: rgba(10, 10, 11, .76);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom-color: var(--line);
+}
+.top-in { display: flex; align-items: center; gap: 28px; height: var(--head); }
+.logo {
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none;
+  font-family: var(--serif-ja); font-weight: 600; font-size: 17px; letter-spacing: .08em;
+}
+.rec { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 10px var(--glow); }
+.nav { margin-left: auto; display: flex; gap: clamp(18px, 2.4vw, 34px); font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; }
+.nav a { position: relative; padding-block: 8px; text-decoration: none; color: var(--ash); transition: color .3s; }
+.nav a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 3px; height: 1px;
+  background: var(--signal); transform: scaleX(0); transform-origin: 0 50%; transition: transform .4s cubic-bezier(.2, .8, .2, 1);
+}
+.nav a:hover { color: var(--bone); }
+.nav a:hover::after { transform: scaleX(1); }
+.lang { display: flex; border: 1px solid var(--line-2); }
+.lang button {
+  min-width: 34px; padding: 5px 9px; border: 0; background: none; cursor: pointer;
+  font-size: 12px; line-height: 1.2; color: var(--ash); transition: color .3s, background-color .3s;
+}
+.lang button[lang="en"] { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; }
+.lang button:hover { color: var(--bone); }
+.lang button[aria-pressed="true"] { background: var(--bone); color: var(--ink); }
+@media (max-width: 720px) { .nav { display: none; } .lang { margin-left: auto; } }
+
+/* ---------- hero ---------- */
+.hero { position: relative; isolation: isolate; display: flex; min-height: 100vh; min-height: 100svh; overflow: hidden; }
+.hero-gl { position: absolute; inset: 0; z-index: -3; display: block; width: 100%; height: 100%; }
+.hero.no-gl { background: repeating-radial-gradient(ellipse 30% 44% at 76% 46%, rgba(238, 233, 223, .2) 0 1.4px, transparent 2.2px 15px), var(--ink); }
+.hero.no-gl .hero-gl { display: none; }
+.hero-shade {
+  position: absolute; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(10, 10, 11, .9) 0%, rgba(10, 10, 11, .62) 30%, rgba(10, 10, 11, 0) 62%),
+    linear-gradient(0deg, rgba(10, 10, 11, .95) 0%, rgba(10, 10, 11, 0) 34%);
+}
+@media (max-aspect-ratio: 1/1) {
+  .hero-shade {
+    background:
+      linear-gradient(180deg, rgba(10, 10, 11, .82) 0%, rgba(10, 10, 11, 0) 22%),
+      linear-gradient(0deg, rgba(10, 10, 11, .97) 0%, rgba(10, 10, 11, .84) 34%, rgba(10, 10, 11, .2) 60%, rgba(10, 10, 11, 0) 78%);
+  }
+}
+.hero-in {
+  position: relative; flex: 1;
+  display: grid; grid-template-rows: auto 1fr auto; gap: 24px;
+  padding-block: calc(var(--head) + env(safe-area-inset-top, 0px) + 22px) calc(var(--tlh) + env(safe-area-inset-bottom, 0px) + 18px);
+}
+.hud { font-size: 11px; line-height: 1.6; letter-spacing: .04em; }
+.hud p { margin: 0; }
+.hud b { font-weight: 500; margin-right: .9em; }
+.hud .dim { color: var(--ash); }
+.read { display: grid; gap: 14px; margin: 26px 0 0; }
+.read div { display: grid; gap: 1px; }
+.read dt { font-size: 10px; letter-spacing: .12em; color: var(--ash); }
+.read dd { margin: 0; font-size: 19px; font-weight: 500; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+@media (max-width: 720px) { .read, .hud .dim { display: none; } }
+
+.hero-main { align-self: end; display: grid; justify-items: start; gap: clamp(14px, 1.8vw, 24px); }
+.hero-eyebrow { margin: 0; font-size: 11.5px; letter-spacing: .22em; color: var(--ash); }
+.name {
+  margin: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 0 .1em;
+  font-family: var(--serif-ja); font-weight: 600; font-size: clamp(84px, 15vw, 262px);
+  line-height: .9; letter-spacing: -.01em; font-feature-settings: "palt" 1;
+}
+.kanji { display: inline-flex; }
+.kanji > span { display: inline-block; text-shadow: 0 0 .45em rgba(10, 10, 11, .7); }
+.stamp {
+  position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: .12em;
+  padding: .17em .2em .13em;
+  font-family: var(--stamp); font-weight: 400; font-size: .34em; line-height: 1; letter-spacing: 0; white-space: nowrap;
+  color: var(--signal);
+  border: .055em solid currentColor;
+  box-shadow: 0 0 0 .05em var(--ink), 0 0 0 .085em currentColor, 0 0 .9em rgba(255, 59, 47, .3);
+  text-shadow: 0 0 .35em rgba(255, 59, 47, .55);
+  transform: rotate(-8deg);
+  filter: url(#ink);
+}
+.stamp small { font-family: var(--mono); font-size: .2em; font-weight: 500; letter-spacing: .26em; }
+.name .stamp { margin-right: .06em; }
+.hero-tag { margin: 0; max-width: 24em; font-size: clamp(20px, 1.6vw + 10px, 34px); line-height: 1.45; text-wrap: balance; }
+.hero-tag [lang="en"] { font-style: italic; font-size: 1.1em; }
+.hero-sub { margin: -6px 0 0; font-size: 14px; letter-spacing: .04em; color: var(--ash); }
+.hero-foot {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 14px 36px;
+  font-size: 11px; letter-spacing: .12em; color: var(--ash);
+}
+.hero-foot p { margin: 0; }
+.cue { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; text-transform: uppercase; color: var(--bone); }
+.cue-line { position: relative; width: 1px; height: 30px; background: linear-gradient(var(--line-2), transparent); }
+.cue-line::after {
+  content: ""; position: absolute; left: -2px; top: 0; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--signal); box-shadow: 0 0 8px var(--signal);
+}
+.geo { margin-left: auto !important; }
+@media (max-width: 640px) {
+  .name { flex-direction: column; align-items: flex-start; gap: .02em; font-size: 26.5vw; }
+  .name .stamp { font-size: .3em; margin: 0 0 .12em .03em; }
+  .name .stamp small, .geo .coords, .hint { display: none; }
+}
+
+/* fingerprint core annotation */
+.core { position: absolute; z-index: -1; left: 0; top: 0; pointer-events: none; transform: translate(var(--cx, -999px), var(--cy, -999px)); }
+.core::before {
+  content: ""; position: absolute; left: -10px; top: -10px; width: 20px; height: 20px; border-radius: 50%;
+  border: 1px solid var(--bone); box-shadow: 0 0 0 4px rgba(10, 10, 11, .35);
+}
+.core::after { content: ""; position: absolute; left: -16px; top: 0; width: 32px; height: 1px; background: var(--bone); }
+.core-line { position: absolute; left: 0; top: 0; width: 150px; height: 1px; background: rgba(238, 233, 223, .75); transform-origin: 0 50%; transform: rotate(-38deg); }
+.core-label {
+  position: absolute; left: 118px; top: -128px; margin: 0; padding: 6px 10px 7px;
+  font-size: 10.5px; line-height: 1.6; white-space: nowrap;
+  background: rgba(10, 10, 11, .82); border-left: 1px solid var(--signal);
+}
+.core-label span { color: var(--ash); }
+@media (max-width: 860px) { .core { display: none; } }
+
+/* clicked stamps */
+.drop { position: absolute; z-index: 5; left: var(--x); top: var(--y); font-size: clamp(30px, 3.6vw, 56px); pointer-events: none; transform: translate(-50%, -50%) rotate(var(--r)); }
+
+/* ---------- shared section bits ---------- */
+.eyebrow {
+  margin: 0 0 clamp(28px, 4vw, 48px); display: flex; align-items: center; gap: 14px;
+  font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ash);
+}
+.eyebrow::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 10px var(--glow); }
+.eyebrow-r { margin-left: auto; }
+.engr {
+  color: transparent;
+  background: repeating-linear-gradient(180deg, var(--bone) 0 2px, transparent 2px 6px);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-stroke: 1px rgba(238, 233, 223, .5);
+}
+
+/* ---------- statement ---------- */
+.statement { padding-block: clamp(110px, 16vw, 220px) clamp(80px, 11vw, 160px); }
+.lit { margin: 0; font-size: clamp(30px, 4.3vw + 8px, 80px); font-weight: 400; line-height: 1.34; letter-spacing: .01em; }
+.lit [lang] { display: block; max-width: 15.5em; }
+.lit [lang="en"] { max-width: 17em; font-size: 1.08em; line-height: 1.16; letter-spacing: -.005em; }
+.lit em { font-style: normal; color: var(--signal); }
+.js .lit .w { opacity: .16; transition: opacity .35s linear; }
+.js .lit .w.on { opacity: 1; }
+.statement-note { margin: clamp(32px, 4.5vw, 60px) 0 0; max-width: 36em; font-size: 15px; color: var(--ash); text-wrap: pretty; }
+
+/* ---------- work ---------- */
+.work-head {
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 32px clamp(16px, 2vw, 32px);
+  padding-block: clamp(36px, 5vw, 72px) clamp(36px, 5vw, 64px);
+}
+.work-head .eyebrow { grid-column: 1 / -1; margin: 0; }
+.work-title { grid-column: 1 / span 6; align-self: end; }
+.big { margin: 0; font-family: var(--serif-ja); font-weight: 900; font-size: clamp(132px, 21vw, 340px); line-height: .82; letter-spacing: -.03em; font-feature-settings: "palt" 1; }
+.work-title .sub { margin: 30px 0 0; font-size: 11.5px; letter-spacing: .22em; color: var(--ash); }
+.work-text { grid-column: 7 / -1; align-self: end; display: grid; gap: 28px; }
+.work-text > p { margin: 0; max-width: 34em; font-size: clamp(15px, .4vw + 13px, 18px); }
+[data-lang="en"] .work-text > p { line-height: 1.65; }
+.spec {
+  margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 9px 28px;
+  padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.6;
+}
+.spec dt { letter-spacing: .14em; color: var(--ash); }
+.spec dd { margin: 0; }
+@media (max-width: 860px) { .work-title, .work-text { grid-column: 1 / -1; } }
+
+/* scroll-scrubbed plates */
+.scrub { position: relative; height: calc(100vh + 6 * 58vh); height: calc(100svh + 6 * 58svh); }
+.scrub-stick { position: sticky; top: 0; display: flex; align-items: center; height: 100vh; height: 100svh; }
+.scrub-grid {
+  display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  grid-template-areas: "bar ." "screen caps" "strip hint";
+  gap: 14px clamp(24px, 3.4vw, 56px); align-items: end;
+  padding-block: calc(var(--head) + 14px) calc(var(--tlh) + 14px);
+}
+.screen-bar { grid-area: bar; display: flex; justify-content: space-between; gap: 16px; font-size: 11px; letter-spacing: .14em; color: var(--ash); }
+.screen-bar b { font-weight: 500; color: var(--bone); }
+.screen-wrap { grid-area: screen; position: relative; width: min(100%, calc((100svh - var(--head) - var(--tlh) - 150px) * 16 / 9)); }
+.marks {
+  position: absolute; inset: -9px; pointer-events: none; --c: rgba(238, 233, 223, .55);
+  background:
+    linear-gradient(var(--c), var(--c)) 0 0 / 14px 1px, linear-gradient(var(--c), var(--c)) 0 0 / 1px 14px,
+    linear-gradient(var(--c), var(--c)) 100% 0 / 14px 1px, linear-gradient(var(--c), var(--c)) 100% 0 / 1px 14px,
+    linear-gradient(var(--c), var(--c)) 0 100% / 14px 1px, linear-gradient(var(--c), var(--c)) 0 100% / 1px 14px,
+    linear-gradient(var(--c), var(--c)) 100% 100% / 14px 1px, linear-gradient(var(--c), var(--c)) 100% 100% / 1px 14px;
+  background-repeat: no-repeat;
+}
+.screen { position: relative; overflow: hidden; aspect-ratio: 16 / 9; max-width: 100%; background: var(--ink-2); }
+.pl {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  clip-path: inset(0 0 100% 0); transition: clip-path .7s cubic-bezier(.7, 0, .2, 1);
+}
+.pl.is-on { z-index: 2; clip-path: inset(0); }
+.pl.is-prev { z-index: 1; clip-path: inset(0); transition: none; }
+.screen::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; z-index: 4; height: 2px; opacity: 0; pointer-events: none;
+  background: var(--signal); box-shadow: 0 0 14px 1px var(--glow);
+}
+.caps { grid-area: caps; align-self: center; display: grid; }
+.cap { grid-area: 1 / 1; display: grid; align-content: start; gap: 10px; opacity: 0; transform: translateY(14px); transition: opacity .4s, transform .6s cubic-bezier(.2, .8, .2, 1); }
+.cap.is-on { opacity: 1; transform: none; transition-delay: .1s; }
+.cap p { margin: 0; }
+.cap-fig { font-size: 11px; letter-spacing: .06em; color: var(--ash); }
+.cap-fig b { margin-right: .7em; font-weight: 500; color: var(--bone); }
+.cap-ly { margin-top: 4px !important; font-family: var(--serif-ja); font-weight: 600; font-size: clamp(34px, 3.3vw, 58px); line-height: 1.18; letter-spacing: .02em; font-feature-settings: "palt" 1; }
+.cap-ly em { font-style: normal; color: var(--signal); }
+.ch { display: inline-block; }
+.cap-tr { font-size: clamp(16px, .6vw + 12px, 21px); color: var(--ash); }
+.cap-tr [lang="en"] { font-family: var(--serif-en); font-style: italic; font-size: 1.16em; }
+.cap-meta { margin-top: 8px !important; font-size: 11px; letter-spacing: .08em; color: var(--signal); }
+.strip { grid-area: strip; display: flex; gap: 8px; }
+.strip button {
+  position: relative; flex: 1 1 0; min-width: 0; max-width: 96px; aspect-ratio: 16 / 9; padding: 0; border: 0; cursor: pointer;
+  background: var(--ink-2) center / cover no-repeat; opacity: .42;
+  outline: 1px solid var(--line); outline-offset: 3px; transition: opacity .3s, outline-color .3s;
+}
+.strip button:hover { opacity: .8; }
+.strip button.is-on { opacity: 1; outline-color: var(--signal); }
+.strip button:focus-visible { outline: 1px solid var(--signal); }
+.strip button span { position: absolute; left: 5px; top: 3px; font: 500 10px/1 var(--mono); text-shadow: 0 0 5px var(--ink); }
+.scrub-hint { grid-area: hint; margin: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ash); }
+@media (max-width: 860px) {
+  .scrub-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "bar" "screen" "strip" "caps"; align-content: center; }
+  .screen-wrap { width: 100%; }
+  .scrub-hint { display: none; }
+}
+@media (max-height: 520px) and (max-width: 1000px) {
+  .scrub { height: auto; }
+  .scrub-stick { position: relative; height: auto; padding-block: 40px; }
+}
+
+/* ---------- method ---------- */
+.method { padding-block: clamp(110px, 14vw, 200px); }
+.method-h { margin: 0 0 clamp(40px, 5vw, 72px); max-width: 16em; font-size: clamp(30px, 3vw + 12px, 60px); font-weight: 400; line-height: 1.22; text-wrap: balance; }
+.method-h[class] [lang="en"] { font-size: 1.08em; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.step { display: grid; align-content: start; gap: 14px; padding: clamp(20px, 2.2vw, 32px); background: var(--ink); transition: background-color .4s; }
+.step:hover { background: var(--ink-2); }
+.step-top { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .16em; color: var(--ash); }
+.step-top b { font-weight: 500; color: var(--signal); }
+.step-k { margin: 6px 0 2px; font-family: var(--serif-ja); font-weight: 900; font-size: clamp(96px, 9vw, 150px); line-height: 1; }
+.step:hover .engr { background-image: repeating-linear-gradient(180deg, var(--signal) 0 2px, transparent 2px 6px); -webkit-text-stroke-color: rgba(255, 59, 47, .6); }
+.step h3 { margin: 0; font-size: clamp(18px, .5vw + 14px, 22px); font-weight: 600; line-height: 1.4; }
+.step p { margin: 0; font-size: 14.5px; line-height: 1.85; color: var(--ash); }
+[data-lang="en"] .step p { line-height: 1.6; }
+@media (max-width: 1040px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .steps { grid-template-columns: minmax(0, 1fr); } .step-k { font-size: 88px; } }
+
+/* ---------- about ---------- */
+.about { padding-block: clamp(110px, 14vw, 200px); }
+.about-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(36px, 6vw, 110px); align-items: center; }
+.about-grid > .eyebrow { grid-column: 1 / -1; margin: 0; }
+.card { position: relative; padding: clamp(18px, 2vw, 26px); border: 1px solid var(--line-2); background: linear-gradient(180deg, var(--ink-2), var(--ink) 72%); }
+.card-top { display: flex; justify-content: space-between; gap: 12px; font-size: 10.5px; letter-spacing: .14em; color: var(--ash); }
+.live { color: var(--signal); }
+.card-fig {
+  position: relative; display: grid; place-items: center; aspect-ratio: 5 / 4; margin: 14px 0 8px; overflow: hidden;
+  background:
+    linear-gradient(var(--line), var(--line)) 50% 0 / 1px 100% no-repeat,
+    linear-gradient(var(--line), var(--line)) 0 50% / 100% 1px no-repeat,
+    radial-gradient(closest-side, rgba(255, 59, 47, .1), transparent);
+}
+.card-fig-l { position: absolute; left: 0; top: 0; margin: 0; font-size: 10px; letter-spacing: .12em; color: var(--ash); }
+.card-k { font-family: var(--serif-ja); font-weight: 900; font-size: clamp(150px, 19vw, 250px); line-height: 1; }
+.card-fig .stamp { position: absolute; right: 8%; bottom: 11%; font-size: clamp(30px, 3.4vw, 50px); transform: rotate(-11deg); }
+.card-name { margin: 4px 0 16px; font-family: var(--serif-ja); font-weight: 600; font-size: clamp(30px, 2.6vw, 40px); line-height: 1.1; letter-spacing: .05em; }
+.facts { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 9px 22px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.6; }
+.facts dt { letter-spacing: .14em; color: var(--ash); }
+.facts dd { margin: 0; }
+.about-text h2 { margin: 0 0 28px; font-size: clamp(34px, 3.5vw + 10px, 76px); font-weight: 400; line-height: 1.14; text-wrap: balance; }
+.about-text h2 [lang="en"] { font-size: 1.08em; }
+.about-text p { margin: 0; max-width: 33em; font-size: clamp(15px, .45vw + 13px, 18.5px); line-height: 1.95; }
+[data-lang="en"] .about-text p { line-height: 1.7; }
+@media (max-width: 860px) { .about-grid { grid-template-columns: minmax(0, 1fr); } .card { max-width: 460px; } }
+
+/* ---------- contact ---------- */
+.contact { position: relative; padding-block: clamp(120px, 16vw, 230px) clamp(80px, 10vw, 140px); overflow: hidden; }
+.wall { position: absolute; top: 0; bottom: 0; right: max(var(--gx), env(safe-area-inset-right, 0px)); width: 1px; background: linear-gradient(transparent, var(--signal) 22%, var(--signal) 78%, transparent); opacity: .75; }
+.wall span { position: absolute; top: 24%; right: 10px; font-size: 10.5px; letter-spacing: .14em; color: var(--signal); writing-mode: vertical-rl; white-space: nowrap; }
+@media (max-width: 860px) { .wall { display: none; } }
+.contact-big { margin: 0; max-width: 11em; font-size: clamp(42px, 6.6vw + 6px, 126px); font-weight: 400; line-height: 1.08; text-wrap: balance; }
+.contact-big [lang="en"] { font-style: italic; }
+.contact-sub { margin: clamp(24px, 3vw, 36px) 0 0; max-width: 34em; font-size: clamp(15px, .4vw + 13px, 18px); color: var(--ash); }
+.links { list-style: none; max-width: 980px; margin: clamp(48px, 6vw, 80px) 0 0; padding: 0; border-top: 1px solid var(--line); }
+.links a {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  padding: clamp(16px, 1.8vw, 24px) 0; border-bottom: 1px solid var(--line);
+  font-family: var(--serif-en); font-size: clamp(26px, 2.4vw + 10px, 46px); line-height: 1.1; text-decoration: none;
+  transition: color .3s, padding-left .45s cubic-bezier(.2, .8, .2, 1);
+}
+.links a:hover, .links a:focus-visible { color: var(--signal); padding-left: 14px; }
+.go { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ash); }
+.go [lang] { font-family: var(--mono); }
+.loop {
+  display: inline-flex; align-items: center; gap: 14px; margin-top: clamp(56px, 7vw, 96px); padding: 13px 22px 13px 16px;
+  border: 1px solid var(--line-2); background: none; cursor: pointer; font-size: 13px; transition: border-color .3s;
+}
+.loop svg { width: 22px; height: 22px; fill: none; stroke: var(--signal); stroke-width: 1.6; stroke-linecap: round; transition: transform .8s cubic-bezier(.2, .8, .2, 1); }
+.loop b { font-family: var(--mono); font-weight: 500; font-size: 11.5px; letter-spacing: .18em; }
+.loop:hover { border-color: var(--signal); }
+.loop:hover svg { transform: rotate(-360deg); }
+
+/* ---------- footer ---------- */
+.foot { border-top: 1px solid var(--line); }
+.foot-in {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 32px;
+  padding-block: 26px calc(var(--tlh) + env(safe-area-inset-bottom, 0px) + 26px);
+  font-size: 11px; letter-spacing: .06em; color: var(--ash);
+}
+.foot-in p { margin: 0; }
+
+/* ---------- six-second timeline ---------- */
+.tl {
+  position: fixed; z-index: 45; left: 0; right: 0; bottom: 0; pointer-events: none;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: linear-gradient(0deg, rgba(10, 10, 11, .92) 35%, rgba(10, 10, 11, 0));
+}
+.tl-in { display: flex; align-items: center; gap: clamp(12px, 1.6vw, 22px); height: var(--tlh); }
+.tl-tc { flex: none; font-size: 12px; font-weight: 500; letter-spacing: .04em; color: var(--signal); font-variant-numeric: tabular-nums; }
+.tl-track { pointer-events: auto; position: relative; flex: 1; min-width: 0; height: 30px; cursor: pointer; touch-action: none; }
+.tl-track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--line-2); }
+.tl-tick { position: absolute; top: calc(50% - 3px); left: calc(var(--k) * 100% / 6); width: 1px; height: 7px; background: var(--line-2); }
+.tl-tick span { position: absolute; top: 9px; left: -2px; font-size: 9px; font-style: normal; color: var(--graphite); }
+.tl-wall { position: absolute; right: 0; top: calc(50% - 9px); width: 1px; height: 18px; background: var(--ash); transition: background-color .3s, box-shadow .3s; }
+.tl-wall span { position: absolute; right: 6px; top: -4px; font-size: 9.5px; letter-spacing: .04em; white-space: nowrap; color: var(--ash); }
+.tl.at-wall .tl-wall { background: var(--signal); box-shadow: 0 0 8px var(--glow); }
+.tl.at-wall .tl-wall span { color: var(--signal); }
+.tl-fill { position: absolute; left: 0; top: 50%; width: 100%; height: 1px; background: var(--signal); box-shadow: 0 0 6px var(--glow); transform-origin: 0 50%; transform: scaleX(var(--p, 0)); }
+.tl-head {
+  position: absolute; top: 50%; left: calc(var(--p, 0) * 100%); width: 9px; height: 9px; margin: -4px 0 0 -4.5px; border-radius: 50%;
+  background: var(--hot); box-shadow: 0 0 0 2px var(--signal), 0 0 16px 4px rgba(255, 59, 47, .6); transition: transform .2s;
+}
+.tl-track:hover .tl-head, .tl-track.drag .tl-head { transform: scale(1.5); }
+.tl-label { flex: none; width: 24ch; overflow: hidden; font-size: 10.5px; letter-spacing: .12em; text-align: right; white-space: nowrap; text-overflow: ellipsis; color: var(--ash); }
+@media (max-width: 640px) { .tl-label, .tl-tick span { display: none; } }
+
+/* ---------- cursor (fine pointers only) ---------- */
+.cur { display: none; }
+.has-cur .cur { display: block; }
+.has-cur, .has-cur * { cursor: none !important; }
+.cur i { position: fixed; z-index: 200; left: 0; top: 0; border-radius: 50%; pointer-events: none; transition: opacity .3s; }
+.cur-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: var(--signal); box-shadow: 0 0 8px var(--glow); }
+.cur-ring { width: 36px; height: 36px; margin: -18px 0 0 -18px; border: 1px solid rgba(238, 233, 223, .45); transition: width .3s, height .3s, margin .3s, border-color .3s, background-color .3s, opacity .3s !important; }
+.cur.aim .cur-ring { width: 84px; height: 84px; margin: -42px 0 0 -42px; border-color: rgba(255, 59, 47, .65); }
+.cur.hot .cur-ring { width: 58px; height: 58px; margin: -29px 0 0 -29px; border-color: var(--signal); background: rgba(255, 59, 47, .08); }
+.cur.off i { opacity: 0; }
+
+/* ---------- motion ---------- */
+.js:not(.is-ready) .hero-eyebrow, .js:not(.is-ready) .kanji > span, .js:not(.is-ready) .name .stamp,
+.js:not(.is-ready) .hero-tag, .js:not(.is-ready) .hero-sub, .js:not(.is-ready) .hud,
+.js:not(.is-ready) .hero-foot, .js:not(.is-ready) .core { opacity: 0; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .is-ready .hero-eyebrow { animation: fadeUp .8s .1s both; }
+  .is-ready .kanji > span { animation: slam .95s cubic-bezier(.16, .84, .24, 1) both; animation-delay: calc(.3s + var(--i) * .11s); }
+  .is-ready .name .stamp { animation: stampIn .55s cubic-bezier(.3, 1.45, .5, 1) 1.02s both; }
+  .is-ready .hero-tag { animation: fadeUp .9s 1.45s both; }
+  .is-ready .hero-sub { animation: fadeUp .9s 1.6s both; }
+  .is-ready .hud { animation: fadeIn 1.2s .5s both; }
+  .is-ready .hero-foot { animation: fadeIn 1s 1.9s both; }
+  .is-ready .core { animation: fadeIn 1s 2s both; }
+  .shake { animation: shake .38s linear; }
+  .rec, .live { animation: blink 1.6s steps(1) infinite; }
+  .cue-line::after { animation: drip 1.9s cubic-bezier(.6, 0, .3, 1) infinite; }
+  .drop { animation: dropIn .45s cubic-bezier(.3, 1.5, .5, 1) both, dropOut .9s ease-in 1.7s forwards; }
+  .screen.scan::after { animation: scanDown .7s cubic-bezier(.7, 0, .2, 1); }
+  .screen.scan.back::after { animation-name: scanUp; }
+  .pl.is-on { animation: kb 9s cubic-bezier(.2, .6, .2, 1) both; }
+  .cap.is-on .ch { animation: chIn .7s cubic-bezier(.2, .9, .2, 1) both; animation-delay: calc(.12s + var(--k) * 42ms); }
+  .step:hover .engr { animation: etch 1.4s linear infinite; }
+  @supports (animation-timeline: view()) {
+    .rv { animation: rv linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drop { animation: dropOut .6s ease-in 1.2s forwards; }
+  .pl { transition: none; }
+}
+@keyframes slam {
+  0% { opacity: 0; transform: translateY(-.06em) scale(1.32); filter: blur(12px); color: var(--hot); }
+  34% { opacity: 1; transform: scale(.965); filter: blur(0); color: var(--hot); text-shadow: 0 0 .3em rgba(255, 138, 91, .9); }
+  52% { transform: scale(1.012); color: var(--signal); text-shadow: 0 0 .25em rgba(255, 59, 47, .7); }
+  100% { opacity: 1; transform: none; filter: none; color: var(--bone); text-shadow: 0 0 .45em rgba(10, 10, 11, .7); }
+}
+@keyframes stampIn {
+  0% { opacity: 0; transform: rotate(-16deg) scale(2.3); }
+  58% { opacity: 1; transform: rotate(-8deg) scale(.93); }
+  100% { opacity: 1; transform: rotate(-8deg) scale(1); }
+}
+@keyframes dropIn {
+  0% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--r)) scale(2.4); }
+  60% { opacity: 1; transform: translate(-50%, -50%) rotate(var(--r)) scale(.92); }
+  100% { opacity: 1; transform: translate(-50%, -50%) rotate(var(--r)) scale(1); }
+}
+@keyframes dropOut { to { opacity: 0; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes shake {
+  0%, 100% { transform: none; }
+  15% { transform: translate(-7px, 4px); }
+  30% { transform: translate(6px, -5px); }
+  45% { transform: translate(-4px, 3px); }
+  60% { transform: translate(3px, -2px); }
+  80% { transform: translate(-1px, 1px); }
+}
+@keyframes blink { 0%, 62% { opacity: 1; } 63%, 100% { opacity: .25; } }
+@keyframes drip { 0% { transform: translateY(-4px); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(30px); opacity: 0; } }
+@keyframes scanDown { 0% { top: 0; opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+@keyframes scanUp { 0% { top: 100%; opacity: 1; } 90% { opacity: 1; } 100% { top: 0; opacity: 0; } }
+@keyframes kb { from { transform: scale(1.07); } to { transform: scale(1); } }
+@keyframes chIn {
+  0% { opacity: 0; transform: translateY(.4em) scale(1.25); filter: blur(5px); color: var(--hot); }
+  60% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+@keyframes etch { to { background-position: 0 12px; } }
+@keyframes rv { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<svg class="defs" aria-hidden="true" focusable="false" width="0" height="0">
+  <filter id="ink" x="-15%" y="-15%" width="130%" height="130%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="11" result="grain"/>
+    <feDisplacementMap in="SourceGraphic" in2="grain" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<!-- ===== 顶栏：名字 + 导航 + 语言切换 ===== -->
+<header class="top" id="topbar">
+  <div class="top-in wrap">
+    <a class="logo" href="#top" lang="ja"><i class="rec" aria-hidden="true"></i>半額水電魚</a>
+    <nav class="nav mono" aria-label="Sections">
+      <a href="#work">Work</a>
+      <a href="#method">Method</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-l="zh" lang="zh-CN" aria-pressed="false">中</button>
+      <button type="button" data-l="ja" lang="ja" aria-pressed="false">日</button>
+      <button type="button" data-l="en" lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ===== 首屏：雕版指纹 + 名字 ===== -->
+<section class="hero" id="top" data-tl="FIG. 00 — 半額水電魚">
+  <canvas class="hero-gl" id="gl" aria-hidden="true"></canvas>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="core mono" id="core" aria-hidden="true">
+    <i class="core-line"></i>
+    <p class="core-label">CORE · 渦状紋<br><span>ridge pitch 0.47 mm</span><br><span>minutiae 37</span></p>
+  </div>
+  <div class="hero-in wrap">
+    <div class="hud mono">
+      <p><b>FIG. 00</b><span lang="ja">半額水電魚 — 標本</span></p>
+      <p class="dim">VIEW from the glass, looking up · SCALE 1:1 · capacitive layer</p>
+      <dl class="read" aria-hidden="true">
+        <div><dt>GAP</dt><dd class="red" id="hGap">24.47 mm</dd></div>
+        <div><dt>V</dt><dd id="hV">0.0 mm/s</dd></div>
+        <div><dt>T+</dt><dd class="red" id="hT">00:00.00</dd></div>
+      </dl>
+    </div>
+    <div class="hero-main">
+      <p class="hero-eyebrow mono">AI × CODE MV — CHIBA, JP</p>
+      <h1 class="name" lang="ja"><span class="stamp" id="heroStamp">半額<small aria-hidden="true">50% OFF</small></span><span class="kanji"><span style="--i:0">水</span><span style="--i:1">電</span><span style="--i:2">魚</span></span></h1>
+      <p class="hero-tag disp t">
+        <span lang="zh-CN">用代码和 AI，一帧一帧给歌做 MV。</span>
+        <span lang="ja">コードとAIで、歌にMVを一コマずつ刻む。</span>
+        <span lang="en">I make music videos in code, one frame at a time, with AI.</span>
+      </p>
+      <p class="hero-sub t">
+        <span lang="zh-CN">在千叶读社会福祉的中国留学生。</span>
+        <span lang="ja">千葉で社会福祉を学ぶ、中国からの留学生。</span>
+        <span lang="en">A student from China, studying social welfare in Chiba.</span>
+      </p>
+    </div>
+    <div class="hero-foot mono">
+      <a class="cue" href="#statement"><span class="cue-line" aria-hidden="true"></span><span class="t"><span lang="zh-CN">向下滚动</span><span lang="ja">スクロール</span><span lang="en">Scroll</span></span></a>
+      <p class="hint t" aria-hidden="true"><span lang="zh-CN">点一下，盖个章</span><span lang="ja">タップ／クリックで押印</span><span lang="en">Tap or click to stamp</span></p>
+      <p class="geo">CHIBA · JP<span class="coords"> — 35.61°N 140.11°E</span> — <span id="clock">--:--:--</span> JST</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 一句话：六秒之墙 ===== -->
+<section class="statement" id="statement" data-tl="六秒の壁 — THE SIX-SECOND WALL">
+  <div class="wrap">
+    <p class="eyebrow mono"><span lang="ja">六秒の壁</span>&nbsp;— The six-second wall</p>
+    <p class="lit disp t">
+      <span lang="zh-CN">刷到一个视频，你会给它几秒？我做的每一帧，都是为了让你的拇指<em>停下来</em>。</span>
+      <span lang="ja">ひとつの動画に、あなたは何秒くれますか。わたしの一コマ一コマは、あなたの親指を<em>止める</em>ためにある。</span>
+      <span lang="en">How many seconds do you give a video before your thumb moves on? Every frame I make is there to <em>stop</em> it.</span>
+    </p>
+    <p class="statement-note t">
+      <span lang="zh-CN">一条短视频，往往只有几秒钟决定会不会被划走。《六秒》这首歌，唱的就是这道墙。</span>
+      <span lang="ja">ショート動画に許された時間は、ほんの数秒。『六秒』は、その壁の歌です。</span>
+      <span lang="en">A short video gets a few seconds before the swipe. “Six Seconds” is a song about that wall.</span>
+    </p>
+  </div>
+</section>
+
+<!-- ===== 作品：EP36《六秒》 ===== -->
+<section class="work" id="work" data-tl="PLATE I — 六秒 · SIX SECONDS">
+  <div class="work-head wrap">
+    <p class="eyebrow mono"><span>Plate I — Selected work</span><span class="eyebrow-r">EP36 · 2026</span></p>
+    <div class="work-title">
+      <h2 class="big engr" lang="ja">六秒</h2>
+      <p class="sub mono">ROKU-BYŌ · SIX SECONDS · CODE MV</p>
+    </div>
+    <div class="work-text">
+      <p class="t rv">
+        <span lang="zh-CN">一首站在短视频这一边唱的歌。被窝里，一根拇指划走了一千个人，下一个轮到“我”。两秒就决定吗？连脸都不看吗？这支 MV 的每一帧都用代码渲染，指纹是 3D 雕版，每一条刻线就是一条指纹脊线。下面是制作中的第一批测试图版。</span>
+        <span lang="ja">ショート動画の側から歌った一曲です。布団の中、親指ひとつで千人が流れていき、お次はわたし。二秒で決めるの？顔すら見ないの？このMVは全コマをコードでレンダリングします。指紋は3Dの版画で、刻線の一本一本がそのまま指紋の隆線になっています。下に並ぶのは、制作中の最初のテストプレートです。</span>
+        <span lang="en">A song sung by a short video, to the thumb about to skip it. Under the covers, one thumb flicks past a thousand people, and I’m next. Two seconds to decide? Not even a look at my face? Every frame of the video is rendered in code. The fingerprint is a 3D engraving, and every cut line is a ridge. Below are the first test plates, still in production.</span>
+      </p>
+      <dl class="spec mono rv">
+        <dt>FORMAT</dt>
+        <dd class="t"><span lang="zh-CN">代码渲染的歌词 MV</span><span lang="ja">コードで描くリリックMV</span><span lang="en">Lyric video, rendered in code</span></dd>
+        <dt>LENGTH</dt>
+        <dd>200 s · 60 fps · 12,000 frames</dd>
+        <dt>TEMPO</dt>
+        <dd>134 → 138 BPM</dd>
+        <dt>LOOK</dt>
+        <dd class="t"><span lang="zh-CN">光线步进 3D · 雕版线描</span><span lang="ja">レイマーチング3D・版画の線</span><span lang="en">Raymarched 3D, engraving lines</span></dd>
+        <dt>SYNC</dt>
+        <dd class="t"><span lang="zh-CN">歌词按音拍逐字对齐</span><span lang="ja">歌詞を一音ずつ同期</span><span lang="en">Lyrics synced syllable by syllable</span></dd>
+        <dt>ENGINE</dt>
+        <dd class="t"><span lang="zh-CN">基于 pdoom-video（MIT）改造</span><span lang="ja">pdoom-video（MIT）を改造</span><span lang="en">Built on pdoom-video (MIT)</span></dd>
+        <dt>STATUS</dt>
+        <dd><span class="red">●</span> <span class="t"><span lang="zh-CN">制作中</span><span lang="ja">制作中</span><span lang="en">In production</span></span></dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- 滚动时逐帧切换的 6 张图版（图片在 assets/ 里） -->
+  <div class="scrub" id="scrub">
+    <div class="scrub-stick">
+      <div class="scrub-grid wrap">
+        <div class="screen-bar mono"><span><b>EP36</b> · S0 TEST PLATES</span><span id="plN">01 / 06</span></div>
+        <div class="screen-wrap">
+          <div class="screen">
+            <img class="pl is-on" src="assets/ep36-01-approach.jpg" alt="A 3D engraved fingerprint coming down toward the glass, with the lyric 指紋が近づく and the red playhead at 3.7 seconds" width="1280" height="720" decoding="async">
+            <img class="pl" src="assets/ep36-02-stop.jpg" alt="The fingerprint frozen 5.68 mm above the glass under a red ストップ stamp" width="1280" height="720" loading="lazy" decoding="async">
+            <img class="pl" src="assets/ep36-03-lattice.jpg" alt="An endless lattice of phones drawn in engraved steel lines, with the lyric 百万本" width="1280" height="720" loading="lazy" decoding="async">
+            <img class="pl" src="assets/ep36-04-lit.jpg" alt="One lit phone screen among a million, labelled No. 0,000,001" width="1280" height="720" loading="lazy" decoding="async">
+            <img class="pl" src="assets/ep36-05-next.jpg" alt="Two lit screens side by side showing the same card, with the lyric 次へ行" width="1280" height="720" loading="lazy" decoding="async">
+            <img class="pl" src="assets/ep36-06-loop.jpg" alt="A red loop drawn around the screens by the playhead, with the lyric ループして" width="1280" height="720" loading="lazy" decoding="async">
+          </div>
+          <i class="marks" aria-hidden="true"></i>
+        </div>
+        <div class="caps" aria-live="polite">
+          <div class="cap is-on">
+            <p class="cap-fig mono"><b>FIG. 04</b><span lang="ja">指紋 — 対手（右母指）</span></p>
+            <p class="cap-ly" lang="ja">指紋が <em>近づく</em></p>
+            <p class="cap-tr t"><span lang="zh-CN">指纹，越来越近</span><span lang="ja"></span><span lang="en">The fingerprint draws near</span></p>
+            <p class="cap-meta mono">GAP 24.47 mm · V 20.3 mm/s</p>
+          </div>
+          <div class="cap" aria-hidden="true">
+            <p class="cap-fig mono"><b>FIG. 04</b><span lang="ja">指紋 — 対手（右母指）</span></p>
+            <p class="cap-ly" lang="ja">そこまで <em>ストップ</em></p>
+            <p class="cap-tr t"><span lang="zh-CN">就到这里，停</span><span lang="ja"></span><span lang="en">Right there. Stop.</span></p>
+            <p class="cap-meta mono">GAP 5.68 mm · STOPPED AT 00:05.01</p>
+          </div>
+          <div class="cap" aria-hidden="true">
+            <p class="cap-fig mono"><b>FIG. 11</b><span lang="ja">動画の奥 — 百万本のうちの一本</span></p>
+            <p class="cap-ly" lang="ja"><em>百万本</em>の</p>
+            <p class="cap-tr t"><span lang="zh-CN">一百万条视频里</span><span lang="ja"></span><span lang="en">Among a million videos</span></p>
+            <p class="cap-meta mono">FEED DEPTH 34,698 items · lit 1</p>
+          </div>
+          <div class="cap" aria-hidden="true">
+            <p class="cap-fig mono"><b>FIG. 11</b><span lang="ja">動画の奥 — 百万本のうちの一本</span></p>
+            <p class="cap-ly" lang="ja">動画の <em>奥</em>の</p>
+            <p class="cap-tr t"><span lang="zh-CN">最深处的那一条</span><span lang="ja"></span><span lang="en">and deep inside the feed, one</span></p>
+            <p class="cap-meta mono">No. 0,000,001 · <span lang="ja">わたし · 再生中</span></p>
+          </div>
+          <div class="cap" aria-hidden="true">
+            <p class="cap-fig mono"><b>FIG. 11</b><span lang="ja">動画の奥 — 百万本のうちの一本</span></p>
+            <p class="cap-ly" lang="ja"><em>次へ</em> 行っても</p>
+            <p class="cap-tr t"><span lang="zh-CN">就算你划到下一条</span><span lang="ja"></span><span lang="en">Swipe to the next one</span></p>
+            <p class="cap-meta mono">FEED DEPTH 1,000,000 items · lit 1</p>
+          </div>
+          <div class="cap" aria-hidden="true">
+            <p class="cap-fig mono"><b>FIG. 11</b><span lang="ja">動画の奥 — 百万本のうちの一本</span></p>
+            <p class="cap-ly" lang="ja"><em>ループ</em> してるよ</p>
+            <p class="cap-tr t"><span lang="zh-CN">我也还在循环哦</span><span lang="ja"></span><span lang="en">and I’m still on loop</span></p>
+            <p class="cap-meta mono">↻ LOOP · FEED DEPTH 1,000,000 items</p>
+          </div>
+        </div>
+        <div class="strip" role="group" aria-label="Plates">
+          <button type="button" class="is-on" aria-pressed="true" aria-label="Plate 1" style="background-image:url(assets/ep36-01-approach.jpg)"><span>1</span></button>
+          <button type="button" aria-pressed="false" aria-label="Plate 2" style="background-image:url(assets/ep36-02-stop.jpg)"><span>2</span></button>
+          <button type="button" aria-pressed="false" aria-label="Plate 3" style="background-image:url(assets/ep36-03-lattice.jpg)"><span>3</span></button>
+          <button type="button" aria-pressed="false" aria-label="Plate 4" style="background-image:url(assets/ep36-04-lit.jpg)"><span>4</span></button>
+          <button type="button" aria-pressed="false" aria-label="Plate 5" style="background-image:url(assets/ep36-05-next.jpg)"><span>5</span></button>
+          <button type="button" aria-pressed="false" aria-label="Plate 6" style="background-image:url(assets/ep36-06-loop.jpg)"><span>6</span></button>
+        </div>
+        <p class="scrub-hint mono t"><span lang="zh-CN">滚动页面，逐帧播放</span><span lang="ja">スクロールでコマ送り</span><span lang="en">Scroll to step through</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 做法：四道工序 ===== -->
+<section class="method" id="method" data-tl="PLATE II — METHOD">
+  <div class="wrap">
+    <p class="eyebrow mono">Plate II — Method</p>
+    <h2 class="method-h disp t">
+      <span lang="zh-CN">一首歌变成 MV，要经过四道工序。</span>
+      <span lang="ja">歌がMVになるまでの、四つの工程。</span>
+      <span lang="en">Four steps from a song to a music video.</span>
+    </h2>
+    <ol class="steps">
+      <li class="step rv">
+        <div class="step-top mono"><b>01</b><span>VOICE</span></div>
+        <span class="step-k engr" aria-hidden="true">声</span>
+        <h3 class="t"><span lang="zh-CN">拆人声，对音拍</span><span lang="ja">声を分けて、拍を合わせる</span><span lang="en">Split and sync</span></h3>
+        <p class="t"><span lang="zh-CN">把人声从歌里分离出来，按每一个音拍对齐歌词。字要在开口的那一帧落下。</span><span lang="ja">歌からボーカルを分離し、歌詞を一音ずつ合わせる。文字は、声が出るその一コマで落ちてくる。</span><span lang="en">Separate the vocal from the mix and align the lyrics syllable by syllable, so each character lands on the frame the voice begins.</span></p>
+      </li>
+      <li class="step rv">
+        <div class="step-top mono"><b>02</b><span>TREATMENT</span></div>
+        <span class="step-k engr" aria-hidden="true">描</span>
+        <h3 class="t"><span lang="zh-CN">写分镜</span><span lang="ja">絵コンテを書く</span><span lang="en">Write the treatment</span></h3>
+        <p class="t"><span lang="zh-CN">一句歌词一个新点子，每一场都有自己的画面母题。</span><span lang="ja">一行ごとに新しいアイデアを、一場面ごとにひとつのモチーフを。</span><span lang="en">A new idea for every line, and a motif for every scene.</span></p>
+      </li>
+      <li class="step rv">
+        <div class="step-top mono"><b>03</b><span>ENGRAVE</span></div>
+        <span class="step-k engr" aria-hidden="true">刻</span>
+        <h3 class="t"><span lang="zh-CN">用代码刻出来</span><span lang="ja">コードで刻む</span><span lang="en">Engrave in code</span></h3>
+        <p class="t"><span lang="zh-CN">和 AI 一起写渲染代码。3D 场景用光线步进计算，再用雕版线条一帧一帧画出来。</span><span lang="ja">AIと一緒にレンダリングのコードを書く。3Dはレイマーチングで計算し、版画の線で一コマずつ描く。</span><span lang="en">Write the renderer together with AI. The 3D is raymarched, then drawn in engraving lines, one frame at a time.</span></p>
+      </li>
+      <li class="step rv">
+        <div class="step-top mono"><b>04</b><span>RELEASE</span></div>
+        <span class="step-k engr" aria-hidden="true">放</span>
+        <h3 class="t"><span lang="zh-CN">发布</span><span lang="ja">公開する</span><span lang="en">Release</span></h3>
+        <p class="t"><span lang="zh-CN">配好字幕和封面，发布出去。然后看看，谁的拇指会停下来。</span><span lang="ja">字幕とサムネイルを仕上げて公開する。あとは、誰の親指が止まるかを見届けるだけ。</span><span lang="en">Finish the subtitles and the cover, publish, and watch whose thumb stops.</span></p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===== 关于我：标本卡 ===== -->
+<section class="about" id="about" data-tl="PLATE III — SPECIMEN">
+  <div class="about-grid wrap">
+    <p class="eyebrow mono">Plate III — Specimen</p>
+    <aside class="card rv" aria-label="Profile">
+      <div class="card-top mono"><span>SPECIMEN No. 0,000,001</span><span class="live">● <span class="t"><span lang="zh-CN">播放中</span><span lang="ja">再生中</span><span lang="en">Now playing</span></span></span></div>
+      <div class="card-fig">
+        <p class="card-fig-l mono">FIG. A — <span lang="ja">魚</span></p>
+        <span class="card-k engr" lang="ja" aria-hidden="true">魚</span>
+        <span class="stamp" aria-hidden="true">半額</span>
+      </div>
+      <p class="card-name" lang="ja">半額水電魚</p>
+      <dl class="facts mono">
+        <dt>BASE</dt>
+        <dd class="t"><span lang="zh-CN">日本 · 千叶</span><span lang="ja">千葉・日本</span><span lang="en">Chiba, Japan</span></dd>
+        <dt>FROM</dt>
+        <dd class="t"><span lang="zh-CN">中国</span><span lang="ja">中国</span><span lang="en">China</span></dd>
+        <dt>STUDY</dt>
+        <dd class="t"><span lang="zh-CN">社会福祉 · 大三</span><span lang="ja">社会福祉・3年</span><span lang="en">Social welfare, 3rd year</span></dd>
+        <dt>SPEAKS</dt>
+        <dd>中文 · <span lang="ja">日本語</span></dd>
+        <dt>INTO</dt>
+        <dd class="t"><span lang="zh-CN">AI 视频 · AI 资讯 · 歌词动效</span><span lang="ja">AI映像・AIニュース・リリックモーション</span><span lang="en">AI video · AI news · lyric motion</span></dd>
+        <dt>NOW</dt>
+        <dd class="t"><span lang="zh-CN">制作 EP36《六秒》</span><span lang="ja">EP36『六秒』を制作中</span><span lang="en">Making EP36 “Six Seconds”</span></dd>
+      </dl>
+    </aside>
+    <div class="about-text rv">
+      <h2 class="disp t">
+        <span lang="zh-CN">白天学照顾人，晚上做 MV。</span>
+        <span lang="ja">昼は福祉を学び、夜はMVを作る。</span>
+        <span lang="en">Care work by day. Music videos by night.</span>
+      </h2>
+      <p class="t">
+        <span lang="zh-CN">我是从中国来日本的留学生，在千叶的大学读社会福祉，现在大三。白天学习怎么去照顾一个人；晚上和 AI 一起写代码，一帧一帧地给歌做 MV。中文和日语都能当工作语言。对我来说，这两件事是相通的，都是为了让一个人被好好看见。</span>
+        <span lang="ja">中国から来た留学生で、千葉の大学で社会福祉を学んでいる3年生です。昼はひとりの人にどう寄り添うかを学び、夜はAIと一緒にコードを書いて、歌に一コマずつMVをつけています。中国語と日本語、どちらでも仕事ができます。わたしにとってこの二つは同じ仕事で、どちらも、誰かがちゃんと見つけてもらえるようにするためのものです。</span>
+        <span lang="en">I’m a student from China in my third year of social welfare at a university in Chiba. By day I learn how to care for one person well. By night I write code with AI and make music videos, one frame at a time. I work in Chinese and Japanese. To me they are the same job, and both are about making sure someone gets seen.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 联系：六秒之墙 ===== -->
+<section class="contact" id="contact" data-tl="PLATE IV — CONTACT">
+  <i class="wall mono" aria-hidden="true"><span lang="ja">六秒の壁 · 06.00 s</span></i>
+  <div class="wrap">
+    <p class="eyebrow mono">Plate IV — Contact</p>
+    <h2 class="contact-big disp t">
+      <span lang="zh-CN">下一个六秒，一起做吧。</span>
+      <span lang="ja">次の六秒を、一緒に。</span>
+      <span lang="en">Let’s make the next six seconds together.</span>
+    </h2>
+    <p class="contact-sub t">
+      <span lang="zh-CN">MV、歌词视频、AI 影像，都欢迎找我合作，也欢迎来聊聊。</span>
+      <span lang="ja">MV、リリックビデオ、AI映像のご相談など、お気軽にどうぞ。</span>
+      <span lang="en">Music videos, lyric videos, AI visuals. Reach out for a project, or just to say hello.</span>
+    </p>
+    <!-- 联系方式：把 href="#contact" 换成你的链接，再删掉 data-todo 和右边的「即将开放」 -->
+    <ul class="links">
+      <li><a href="#contact" data-todo>YouTube <span class="go t"><span lang="zh-CN">即将开放</span><span lang="ja">準備中</span><span lang="en">Soon</span></span></a></li>
+      <li><a href="#contact" data-todo>Bilibili <span class="go t"><span lang="zh-CN">即将开放</span><span lang="ja">準備中</span><span lang="en">Soon</span></span></a></li>
+      <li><a href="#contact" data-todo>X <span class="go t"><span lang="zh-CN">即将开放</span><span lang="ja">準備中</span><span lang="en">Soon</span></span></a></li>
+      <li><a href="#contact" data-todo>Email <span class="go t"><span lang="zh-CN">即将开放</span><span lang="ja">準備中</span><span lang="en">Soon</span></span></a></li>
+    </ul>
+    <button type="button" class="loop" id="loop">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.6 3.8v4.6H15"/></svg>
+      <b>LOOP</b>
+      <span class="t"><span lang="zh-CN">从头再看一遍</span><span lang="ja">もう一度はじめから</span><span lang="en">Play it again</span></span>
+    </button>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot-in wrap mono">
+    <p>© 2026 <span lang="ja">半額水電魚</span> · CHIBA, JP</p>
+    <p class="t"><span lang="zh-CN">作品图：EP36《六秒》测试图版 · 渲染引擎基于 pdoom-video（MIT）</span><span lang="ja">作品画像：EP36『六秒』テストプレート · エンジンは pdoom-video（MIT）を改造</span><span lang="en">Stills: EP36 “Six Seconds” test plates · Engine built on pdoom-video (MIT)</span></p>
+  </div>
+</footer>
+
+<!-- 底部的 6 秒进度条：整页 = 6 秒，可以拖动 -->
+<div class="tl mono" id="tl">
+  <div class="tl-in wrap">
+    <span class="tl-tc" id="tc">00:00.00</span>
+    <div class="tl-track" id="track" role="slider" tabindex="0" aria-label="Page timeline, 6 seconds" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0" aria-valuetext="00:00.00">
+      <i class="tl-tick" style="--k:0"></i>
+      <i class="tl-tick" style="--k:1"><span>1</span></i>
+      <i class="tl-tick" style="--k:2"><span>2</span></i>
+      <i class="tl-tick" style="--k:3"><span>3</span></i>
+      <i class="tl-tick" style="--k:4"><span>4</span></i>
+      <i class="tl-tick" style="--k:5"><span>5</span></i>
+      <i class="tl-wall"><span lang="ja">六秒の壁</span></i>
+      <i class="tl-fill"></i>
+      <i class="tl-head"></i>
+    </div>
+    <span class="tl-label" id="tlLabel">FIG. 00 — 半額水電魚</span>
+  </div>
+</div>
+
+<div class="cur off" id="cur" aria-hidden="true"><i class="cur-ring"></i><i class="cur-dot"></i></div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const pad = n => String(n).padStart(2, '0');
+
+  /* ---------- digits scramble for 3–5 frames, then settle ---------- */
+  const GLYPHS = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZ#%&+-/<>';
+  function scramble(el, text) {
+    clearTimeout(el._sr);
+    if (reduce) { el.textContent = text; return; }
+    let n = 3 + Math.floor(Math.random() * 3);
+    (function step() {
+      if (n-- <= 0) { el.textContent = text; return; }
+      el.textContent = text.replace(/[A-Za-z0-9]/g, () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)]);
+      el._sr = setTimeout(step, 45);
+    })();
+  }
+
+  /* wrap every character (or word) of el's text in <span class=cls> */
+  function split(el, mode, cls) {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    const out = [];
+    nodes.forEach(node => {
+      const parts = mode === 'char' ? Array.from(node.nodeValue) : node.nodeValue.split(/(\s+)/);
+      const frag = document.createDocumentFragment();
+      parts.forEach(s => {
+        if (!s) return;
+        if (/^\s+$/.test(s)) { frag.appendChild(document.createTextNode(s)); return; }
+        const sp = document.createElement('span');
+        sp.className = cls;
+        sp.textContent = s;
+        frag.appendChild(sp);
+        out.push(sp);
+      });
+      node.parentNode.replaceChild(frag, node);
+    });
+    return out;
+  }
+
+  /* ---------- clock (JST) ---------- */
+  const clock = $('#clock');
+  const tickClock = () => { clock.textContent = new Date(Date.now() + 324e5).toISOString().slice(11, 19); };
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  /* ---------- hero: engraved fingerprint in WebGL ---------- */
+  const VS = 'attribute vec2 aPos; void main() { gl_Position = vec4(aPos, 0.0, 1.0); }';
+  const FS = `
+#ifdef GL_OES_standard_derivatives
+#extension GL_OES_standard_derivatives : enable
+#endif
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+uniform vec2 uRes;
+uniform float uTime;
+uniform vec2 uMouse;
+uniform float uHover;
+uniform float uReveal;
+uniform vec2 uCenter;
+uniform float uScale;
+uniform vec3 uShock[4];
+
+const vec3 INK = vec3(0.039, 0.039, 0.043);
+const vec3 BONE = vec3(0.933, 0.914, 0.875);
+const vec3 SIG = vec3(1.0, 0.231, 0.184);
+const vec3 EMB = vec3(1.0, 0.541, 0.357);
+
+float hash(vec2 p) {
+  p = fract(p * vec2(234.34, 435.345));
+  p += dot(p, p + 34.23);
+  return fract(p.x * p.y);
+}
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+float fbm(vec2 p) {
+  float s = 0.0, a = 0.5;
+  for (int i = 0; i < 3; i++) { s += a * noise(p); p = p * 2.03 + 11.7; a *= 0.5; }
+  return s;
+}
+
+void main() {
+  vec2 fc = gl_FragCoord.xy;
+  vec2 p = (fc - 0.5 * uRes) / uRes.y;
+  vec2 m = (uMouse - 0.5 * uRes) / uRes.y;
+  float t = uTime;
+
+  // shock rings from the stamps
+  float sh = 0.0;
+  for (int i = 0; i < 4; i++) {
+    vec3 s = uShock[i];
+    if (s.z >= 0.0 && s.z < 1.6) {
+      vec2 c = (s.xy - 0.5 * uRes) / uRes.y;
+      float k = (length(p - c) - s.z * 1.1) / (0.05 + s.z * 0.12);
+      sh += exp(-k * k) * (1.0 - s.z / 1.6);
+    }
+  }
+
+  // loupe: magnify the ridges under the cursor
+  vec2 dm = p - m;
+  float lens = uHover * exp(-dot(dm, dm) * 55.0);
+  vec2 pl = m + dm * (1.0 - 0.38 * lens);
+
+  // fingerprint field: warped ellipses with a slow whorl
+  vec2 q = (pl - uCenter) / uScale;
+  q.y *= 0.86;
+  vec2 w = vec2(fbm(q * 1.4 + vec2(0.0, t * 0.05)), fbm(q * 1.4 + vec2(5.2, -t * 0.04))) - 0.5;
+  vec2 e = q + w * 0.34;
+  float r = length(e);
+  float a = atan(e.y, e.x + 1e-5);
+  float f = r * 21.0 + 1.1 * sin(a + r * 2.6 + t * 0.12) * smoothstep(0.05, 0.7, r) + 1.4 * (fbm(e * 4.0 + 3.1) - 0.5) + sh * 5.0;
+
+  // engraving: line width follows the light on a dome
+  float inside = 1.0 - smoothstep(0.92, 1.06, r);
+  float hgt = sqrt(max(0.0, 1.0 - r * r));
+  vec3 n = normalize(vec3(e * 1.15, hgt + 0.2));
+  float L = clamp(dot(n, normalize(vec3(-0.45, 0.55, 0.7))), 0.0, 1.0);
+  float hw = mix(0.04, 0.42, L * L) * inside + 0.05 * (1.0 - inside);
+
+#ifdef GL_OES_standard_derivatives
+  float fw = max(fwidth(f), 1e-4);
+#else
+  float fw = 27.0 / (uScale * uRes.y);
+#endif
+  float d = abs(fract(f + 0.5) - 0.5);
+  float cov = 1.0 - smoothstep(hw - fw, hw + fw, d);
+  cov = mix(cov, hw * 2.0, smoothstep(0.3, 0.7, fw));
+  cov *= 1.0 - 0.85 * smoothstep(0.8, 0.86, noise(e * 46.0)) * inside;
+
+  float fade = mix(1.0, 0.34 * exp(-(r - 1.0) * 1.1), 1.0 - inside);
+  float rev = 1.0 - smoothstep(uReveal * 3.6 - 0.3, uReveal * 3.6, r);
+  float alpha = cov * fade * rev;
+
+  float rim = smoothstep(0.7, 1.0, r) * inside;
+  vec3 lc = mix(BONE, SIG, rim * 0.75);
+  lc = mix(lc, SIG, lens * 0.85);
+  lc = mix(lc, EMB, clamp(sh, 0.0, 1.0) * 0.9);
+
+  float halo = (r - 1.04) * 6.0;
+  vec3 col = INK + SIG * 0.07 * exp(-halo * halo) * rev;
+  col = mix(col, lc, alpha * (0.55 + 0.4 * inside));
+  col += SIG * 0.06 * lens;
+  vec2 v = p * vec2(0.62, 0.95);
+  col *= 1.0 - 0.5 * dot(v, v);
+  col += (hash(fc + fract(t * 13.7) * 97.0) - 0.5) * 0.03;
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+  const hero = $('#top');
+  const heroIn = $('.hero-in', hero);
+  const canvas = $('#gl');
+  const core = $('#core');
+  const G = { ok: false, w: 1, h: 1, cssW: 1, cssH: 1, cx: 0.4, cy: 0.03, sc: 0.44, coreX: 0, coreY: 0 };
+  const ptr = { x: -1, y: -1, sx: -1, sy: -1, h: 0, sh: 0, lx: 0, ly: 0, lt: 0, speed: 0 };
+  const shocks = [];
+  const shockBuf = new Float32Array(12);
+  const U = {};
+  let gl = null;
+
+  (function initGL() {
+    try { gl = canvas.getContext('webgl', { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'high-performance' }); } catch (e) { gl = null; }
+    if (!gl) return;
+    gl.getExtension('OES_standard_derivatives');
+    const mk = (type, src) => {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (gl.getShaderParameter(s, gl.COMPILE_STATUS)) return s;
+      console.warn(gl.getShaderInfoLog(s));
+      return null;
+    };
+    const vs = mk(gl.VERTEX_SHADER, VS), fs = mk(gl.FRAGMENT_SHADER, FS);
+    if (!vs || !fs) return;
+    const pr = gl.createProgram();
+    gl.attachShader(pr, vs);
+    gl.attachShader(pr, fs);
+    gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return;
+    gl.useProgram(pr);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const a = gl.getAttribLocation(pr, 'aPos');
+    gl.enableVertexAttribArray(a);
+    gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
+    ['uRes', 'uTime', 'uMouse', 'uHover', 'uReveal', 'uCenter', 'uScale', 'uShock'].forEach(k => { U[k] = gl.getUniformLocation(pr, k); });
+    G.ok = true;
+  })();
+  if (!G.ok) hero.classList.add('no-gl');
+  canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); G.ok = false; hero.classList.add('no-gl'); });
+
+  function layoutHero() {
+    const r = hero.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    let w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+    const cap = 2.2e6;
+    if (w * h > cap) { const k = Math.sqrt(cap / (w * h)); w = Math.round(w * k); h = Math.round(h * k); }
+    Object.assign(G, { w, h, cssW: r.width, cssH: r.height });
+    const asp = r.width / r.height;
+    if (asp >= 1.05) Object.assign(G, { cx: asp * 0.25, cy: 0.03, sc: 0.44 });
+    else Object.assign(G, { cx: asp * 0.11, cy: 0.2, sc: Math.min(0.34, asp * 0.66) });
+    G.coreX = r.width / 2 + G.cx * r.height;
+    G.coreY = r.height / 2 - G.cy * r.height;
+    core.style.setProperty('--cx', G.coreX.toFixed(1) + 'px');
+    core.style.setProperty('--cy', G.coreY.toFixed(1) + 'px');
+    if (G.ok) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
+    if (reduce) drawStill();
+  }
+
+  function draw(t, rev, now) {
+    for (let i = 0; i < 4; i++) {
+      const s = shocks[i];
+      shockBuf[i * 3] = s ? s.x : 0;
+      shockBuf[i * 3 + 1] = s ? s.y : 0;
+      shockBuf[i * 3 + 2] = s ? (now - s.t) / 1000 : -1;
+    }
+    gl.uniform2f(U.uRes, G.w, G.h);
+    gl.uniform1f(U.uTime, t);
+    gl.uniform2f(U.uMouse, ptr.sx * G.w / G.cssW, G.h - ptr.sy * G.h / G.cssH);
+    gl.uniform1f(U.uHover, ptr.sh);
+    gl.uniform1f(U.uReveal, rev);
+    gl.uniform2f(U.uCenter, G.cx, G.cy);
+    gl.uniform1f(U.uScale, G.sc);
+    gl.uniform3fv(U.uShock, shockBuf);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+
+  // live readouts, in the units of the MV's FIG. 04 plate
+  const hGap = $('#hGap'), hV = $('#hV'), hT = $('#hT');
+  const MM = 0.062;
+  let hudAt = 0;
+  function readouts(now, t) {
+    if (now - hudAt < 60) return;
+    hudAt = now;
+    const on = ptr.sh > 0.05;
+    const gap = on ? Math.hypot(ptr.sx - G.coreX, ptr.sy - G.coreY) * MM : 24.47 + Math.sin(t * 0.5) * 3.2;
+    ptr.speed *= 0.86;
+    hGap.textContent = gap.toFixed(2) + ' mm';
+    hV.textContent = (on ? ptr.speed * MM : 0).toFixed(1) + ' mm/s';
+    const s = ready ? Math.max(0, (now - introAt) / 1000) : 0;
+    hT.textContent = pad(Math.floor(s / 60)) + ':' + pad(Math.floor(s % 60)) + '.' + pad(Math.floor((s % 1) * 100));
+  }
+
+  let raf = 0, heroOn = true, ready = false, introAt = performance.now();
+  const t0 = performance.now();
+  function frame(now) {
+    raf = 0;
+    const t = (now - t0) / 1000;
+    if (ptr.sx < 0 && ptr.x >= 0) { ptr.sx = ptr.x; ptr.sy = ptr.y; }
+    ptr.sx += (ptr.x - ptr.sx) * 0.14;
+    ptr.sy += (ptr.y - ptr.sy) * 0.14;
+    ptr.sh += (ptr.h - ptr.sh) * 0.06;
+    const k = ready ? clamp((now - introAt) / 2000, 0, 1) : 0;
+    if (G.ok) draw(t, 1 - Math.pow(1 - k, 3), now);
+    readouts(now, t);
+    if (heroOn && !document.hidden) raf = requestAnimationFrame(frame);
+  }
+  function wake() { if (!raf && !reduce && heroOn && !document.hidden) raf = requestAnimationFrame(frame); }
+  function drawStill() { const now = performance.now(); if (G.ok) draw(12, 1, now); readouts(now, 0); }
+
+  hero.addEventListener('pointermove', e => {
+    const r = hero.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top, now = performance.now();
+    if (ptr.lt) {
+      const v = Math.hypot(x - ptr.lx, y - ptr.ly) / Math.max(1, now - ptr.lt) * 1000;
+      ptr.speed += (v - ptr.speed) * 0.25;
+    }
+    Object.assign(ptr, { x, y, lx: x, ly: y, lt: now, h: 1 });
+    if (reduce) { ptr.sx = x; ptr.sy = y; ptr.sh = 1; drawStill(); }
+    wake();
+  }, { passive: true });
+  hero.addEventListener('pointerleave', () => { ptr.h = 0; if (reduce) { ptr.sh = 0; drawStill(); } });
+
+  function addShock(clientX, clientY) {
+    if (!G.ok || reduce) return;
+    const r = canvas.getBoundingClientRect();
+    shocks.push({ x: (clientX - r.left) * G.w / r.width, y: G.h - (clientY - r.top) * G.h / r.height, t: performance.now() });
+    if (shocks.length > 4) shocks.shift();
+    wake();
+  }
+  function shake() {
+    if (reduce) return;
+    heroIn.classList.remove('shake');
+    void heroIn.offsetWidth;
+    heroIn.classList.add('shake');
+  }
+
+  // click the hero to stamp it
+  const WORDS = ['半額', 'ストップ', '再生中'];
+  let wordAt = 0;
+  hero.addEventListener('click', e => {
+    if (e.target.closest('a, button')) return;
+    const r = hero.getBoundingClientRect();
+    const s = document.createElement('span');
+    s.className = 'stamp drop';
+    s.lang = 'ja';
+    s.setAttribute('aria-hidden', 'true');
+    s.textContent = WORDS[wordAt++ % WORDS.length];
+    s.style.setProperty('--x', Math.round(e.clientX - r.left) + 'px');
+    s.style.setProperty('--y', Math.round(e.clientY - r.top) + 'px');
+    s.style.setProperty('--r', (Math.random() * 22 - 11).toFixed(1) + 'deg');
+    hero.appendChild(s);
+    const drops = $$('.drop', hero);
+    if (drops.length > 6) drops[0].remove();
+    setTimeout(() => s.remove(), 2900);
+    addShock(e.clientX, e.clientY);
+    shake();
+  });
+
+  // title sequence: lines draw in, 水電魚 slam in, the 半額 stamp hits
+  const heroStamp = $('#heroStamp');
+  function start() {
+    if (ready) return;
+    ready = true;
+    introAt = performance.now();
+    root.classList.add('is-ready');
+    if (reduce) { drawStill(); return; }
+    wake();
+    setTimeout(() => {
+      const r = heroStamp.getBoundingClientRect();
+      addShock(r.left + r.width / 2, r.top + r.height / 2);
+      shake();
+    }, 1330);
+  }
+  const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+  Promise.race([fontsReady, new Promise(res => setTimeout(res, 1200))]).then(start);
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(es => { heroOn = es[0].isIntersecting; if (heroOn) wake(); }).observe(hero);
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
+
+  /* ---------- statement: light up as you scroll ---------- */
+  const lits = $$('.lit').map(el => {
+    const sets = {};
+    $$(':scope > [lang]', el).forEach(c => {
+      const l = c.getAttribute('lang').slice(0, 2);
+      sets[l] = split(c, l === 'en' ? 'word' : 'char', 'w');
+    });
+    return { el, sets, n: -1, l: '' };
+  });
+  function updLit() {
+    const vh = innerHeight, l = root.dataset.lang;
+    lits.forEach(o => {
+      const ws = o.sets[l];
+      if (!ws) return;
+      const r = o.el.getBoundingClientRect();
+      const n = Math.round(clamp((vh * 0.86 - r.top) / (r.height + vh * 0.36), 0, 1) * ws.length);
+      if (n === o.n && l === o.l) return;
+      o.n = n;
+      o.l = l;
+      ws.forEach((w, i) => w.classList.toggle('on', i < n));
+    });
+  }
+
+  /* ---------- EP36 plates, scrubbed by scroll ---------- */
+  const scrub = $('#scrub');
+  const screen = $('.screen', scrub);
+  const plates = $$('.pl', scrub), caps = $$('.cap', scrub), thumbs = $$('.strip button', scrub);
+  const plN = $('#plN');
+  const N = plates.length;
+  let cur = 0;
+  $$('.cap-ly', scrub).forEach(el => split(el, 'char', 'ch').forEach((s, i) => s.style.setProperty('--k', i)));
+
+  function setPlate(i) {
+    if (i === cur || i < 0 || i >= N) return;
+    const dir = i > cur ? 1 : -1;
+    const prev = plates[cur], next = plates[i];
+    plates.forEach(p => p.classList.remove('is-prev'));
+    prev.classList.remove('is-on');
+    prev.classList.add('is-prev');
+    if (!reduce) {
+      next.style.transition = 'none';
+      next.style.clipPath = dir > 0 ? 'inset(0 0 100% 0)' : 'inset(100% 0 0 0)';
+      void next.offsetWidth;
+      next.style.transition = '';
+      next.style.clipPath = '';
+      screen.classList.remove('scan', 'back');
+      void screen.offsetWidth;
+      screen.classList.add('scan');
+      if (dir < 0) screen.classList.add('back');
+    }
+    next.classList.add('is-on');
+    caps.forEach((c, k) => { c.classList.toggle('is-on', k === i); c.setAttribute('aria-hidden', String(k !== i)); });
+    thumbs.forEach((b, k) => { b.classList.toggle('is-on', k === i); b.setAttribute('aria-pressed', String(k === i)); });
+    scramble(plN, pad(i + 1) + ' / ' + pad(N));
+    cur = i;
+  }
+  function updScrub() {
+    const r = scrub.getBoundingClientRect();
+    const total = r.height - innerHeight;
+    if (total < 40) return;
+    setPlate(Math.floor(clamp(-r.top / total, 0, 0.9999) * N));
+  }
+  thumbs.forEach((b, i) => b.addEventListener('click', () => {
+    const total = scrub.offsetHeight - innerHeight;
+    if (total < 40) { setPlate(i); return; }
+    const top = scrub.getBoundingClientRect().top + scrollY;
+    window.scrollTo({ top: top + total * (i + 0.5) / N, behavior: reduce ? 'auto' : 'smooth' });
+  }));
+
+  /* ---------- the page is six seconds long ---------- */
+  const tl = $('#tl'), track = $('#track'), tc = $('#tc'), tlLabel = $('#tlLabel');
+  const marks = $$('[data-tl]');
+  let label = '';
+  const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - innerHeight);
+  function updTL() {
+    const p = clamp(scrollY / maxScroll(), 0, 1), s = p * 6;
+    const code = '00:' + pad(Math.floor(s)) + '.' + pad(Math.floor((s % 1) * 100));
+    track.style.setProperty('--p', p.toFixed(4));
+    tc.textContent = code;
+    track.setAttribute('aria-valuenow', s.toFixed(2));
+    track.setAttribute('aria-valuetext', code);
+    tl.classList.toggle('at-wall', p > 0.995);
+    let lab = marks[0].dataset.tl;
+    marks.forEach(m => { if (m.getBoundingClientRect().top < innerHeight * 0.5) lab = m.dataset.tl; });
+    if (lab !== label) { label = lab; scramble(tlLabel, lab); }
+  }
+  let dragging = false;
+  const seek = e => {
+    const r = track.getBoundingClientRect();
+    window.scrollTo(0, clamp((e.clientX - r.left) / r.width, 0, 1) * maxScroll());
+  };
+  track.addEventListener('pointerdown', e => {
+    dragging = true;
+    track.classList.add('drag');
+    try { track.setPointerCapture(e.pointerId); } catch (err) { /* capture is optional */ }
+    seek(e);
+    e.preventDefault();
+  });
+  track.addEventListener('pointermove', e => { if (dragging) seek(e); });
+  const endDrag = () => { dragging = false; track.classList.remove('drag'); };
+  track.addEventListener('pointerup', endDrag);
+  track.addEventListener('pointercancel', endDrag);
+  track.addEventListener('keydown', e => {
+    const step = maxScroll() / 6;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') window.scrollBy(0, step);
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') window.scrollBy(0, -step);
+    else if (e.key === 'Home') window.scrollTo(0, 0);
+    else if (e.key === 'End') window.scrollTo(0, maxScroll());
+    else return;
+    e.preventDefault();
+  });
+
+  /* ---------- header, links, loop ---------- */
+  const topbar = $('#topbar');
+  $$('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+    if (a.hasAttribute('data-todo')) { e.preventDefault(); return; }
+    const target = document.getElementById(a.getAttribute('href').slice(1));
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  }));
+  $('#loop').addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    if (reduce) return;
+    let waited = 0;
+    const iv = setInterval(() => {
+      waited += 100;
+      if (scrollY > 4 && waited < 3000) return;
+      clearInterval(iv);
+      root.classList.remove('is-ready');
+      ready = false;
+      void root.offsetWidth;
+      start();
+    }, 100);
+  });
+
+  let ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      topbar.classList.toggle('is-solid', scrollY > 24);
+      updTL();
+      updLit();
+      updScrub();
+    });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', () => { layoutHero(); onScroll(); });
+
+  /* ---------- cursor ---------- */
+  if (fine && !reduce) {
+    root.classList.add('has-cur');
+    const cursor = $('#cur'), dot = $('.cur-dot', cursor), ring = $('.cur-ring', cursor);
+    let x = -100, y = -100, rx = -100, ry = -100, run = 0;
+    const follow = () => {
+      rx += (x - rx) * 0.2;
+      ry += (y - ry) * 0.2;
+      dot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+      ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0)';
+      run = Math.abs(x - rx) + Math.abs(y - ry) > 0.3 ? requestAnimationFrame(follow) : 0;
+    };
+    addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse') return;
+      if (rx < 0) { rx = e.clientX; ry = e.clientY; }
+      x = e.clientX;
+      y = e.clientY;
+      cursor.classList.remove('off');
+      if (!run) run = requestAnimationFrame(follow);
+    }, { passive: true });
+    root.addEventListener('mouseleave', () => cursor.classList.add('off'));
+    addEventListener('pointerover', e => {
+      const el = e.target instanceof Element ? e.target : null;
+      const hot = !!(el && el.closest('a, button, [role="slider"]'));
+      cursor.classList.toggle('hot', hot);
+      cursor.classList.toggle('aim', !hot && !!(el && el.closest('#top')));
+    });
+  }
+
+  /* ---------- language ---------- */
+  const TAGS = { zh: 'zh-CN', ja: 'ja', en: 'en' };
+  const langBtns = $$('.lang button');
+  function applyLang(l) {
+    root.setAttribute('data-lang', l);
+    root.setAttribute('lang', TAGS[l]);
+    langBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === l)));
+    onScroll();
+  }
+  langBtns.forEach(b => b.addEventListener('click', () => {
+    const l = b.dataset.l;
+    if (l === root.dataset.lang) return;
+    try { localStorage.setItem('hsg-lang', l); } catch (e) { /* private mode: keep it for this visit only */ }
+    if (document.startViewTransition && !reduce) document.startViewTransition(() => applyLang(l));
+    else applyLang(l);
+  }));
+
+  applyLang(TAGS[root.dataset.lang] ? root.dataset.lang : 'zh');
+  layoutHero();
+  wake();
+})();
+</script>
+</body>
+</html>
