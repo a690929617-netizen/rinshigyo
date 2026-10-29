@@ -55,10 +55,18 @@ ffmpeg -i ../out/thumb.mp4 -vf "trim=start_frame=1,setpts=PTS-STARTPTS,scale=128
 
 链接后面加 `#zh`、`#ja` 或 `#en`，打开就是对应语言。不加的话，按访客浏览器的语言自动选；访客自己切换过一次后会记住。
 
-## 上线（拿到自己的网址）
+## 上线（拿到一个谁都能打开的网址）
 
-- **最简单**：打开 Netlify Drop（https://app.netlify.com/drop），把整个 `site` 文件夹拖进去，几秒钟就有一个公开网址。
-- **以后常改**：用 GitHub Pages 或 Cloudflare Pages 连上这个仓库，每次推送都会自动更新。
+用 GitHub Pages，免费，以后每次推送都会自动更新：
+
+1. 打开 https://github.com/a690929617-netizen/rinshigyo/settings/pages
+2. 「Source」选 **Deploy from a branch**
+3. 「Branch」选 `claude/wizardly-dijkstra-0qyvdh`，旁边的文件夹选 `/ (root)`，点 **Save**
+4. 等 1～2 分钟，网址就是 https://a690929617-netizen.github.io/rinshigyo/site/
+
+这个分支以后合并进默认分支的话，把第 3 步的分支换成默认分支就行。仓库根目录的 `.nojekyll` 让 GitHub 原样发布文件，不做额外处理。网页里的分享预览卡（`assets/og.jpg`）用的就是这个网址，换了托管地址要把 `og:url` 和 `og:image` 两行一起改掉。
+
+不想用 GitHub 的话，也可以打开 Netlify Drop（https://app.netlify.com/drop），把整个 `site` 文件夹拖进去。
 
 ## 页面上有什么
 
