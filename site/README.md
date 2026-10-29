@@ -40,11 +40,16 @@ bun scripts/render.ts video --from 27.7058 --to 32.1176 --fps 30 --noaudio --onl
 bun scripts/render.ts video --from 104.4706 --to 113.2941 --fps 30 --noaudio --only deep --out ../out/deep.mp4
 ```
 
-起止时间是 `timeline.ts` 里 `thumb`、`deep` 两个场景的窗口，换了数据要跟着改。云端没有显卡时加 `CHROME_PATH=/path/to/chromium`。渲出来是 1920×1080，网站用的是缩到 1280 宽再压缩的版本：
+起止时间是 `timeline.ts` 里 `thumb`、`deep` 两个场景的窗口，换了数据要跟着改。云端没有显卡时加 `CHROME_PATH=/path/to/chromium`（云端约 8～12 秒一帧，两段一共要一个多小时）。
+
+渲出来是 1920×1080，网站用的是缩到 1280 宽再压缩的版本。引擎输出的**第 0 帧是全黑的**，要剪掉，不然视频每次循环都会闪一下黑：
 
 ```bash
-ffmpeg -i ../out/thumb.mp4 -vf "scale=1280:-2:flags=lanczos" -c:v libx264 -preset slow -crf 24 -pix_fmt yuv420p -an -movflags +faststart ../../site/assets/ep36-thumb.mp4
+ffmpeg -i ../out/thumb.mp4 -vf "trim=start_frame=1,setpts=PTS-STARTPTS,scale=1280:-2:flags=lanczos" -c:v libx264 -preset slow -crf 24 -pix_fmt yuv420p -an -movflags +faststart ../../site/assets/ep36-thumb.mp4
+ffmpeg -i ../out/thumb.mp4 -vf "trim=start_frame=1,setpts=PTS-STARTPTS,scale=1280:-2:flags=lanczos" -c:v libvpx-vp9 -b:v 0 -crf 36 -row-mt 1 -an ../../site/assets/ep36-thumb.webm
 ```
+
+`deep` 同理。网页里每段视频都放了 MP4 和 WebM 两份，浏览器会自动挑能播的那份。
 
 ## 分享时指定语言
 
