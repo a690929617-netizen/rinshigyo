@@ -97,6 +97,7 @@ a { color: inherit; }
 button { font: inherit; color: inherit; }
 ::selection { background: var(--signal); color: var(--ink); }
 :focus-visible { outline: 1px solid var(--signal); outline-offset: 3px; }
+.cta:active, .loop:active, .lang button:active, .strip button:active, .reel-btn:active { transform: translateY(1px); }
 .defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 .red { color: var(--signal); }
 section { scroll-margin-top: var(--head); }
@@ -141,8 +142,8 @@ section { scroll-margin-top: var(--head); }
   content: ""; position: absolute; left: 0; right: 0; bottom: 3px; height: 1px;
   background: var(--signal); transform: scaleX(0); transform-origin: 0 50%; transition: transform .4s cubic-bezier(.2, .8, .2, 1);
 }
-.nav a:hover { color: var(--bone); }
-.nav a:hover::after { transform: scaleX(1); }
+.nav a:hover, .nav a[aria-current] { color: var(--bone); }
+.nav a:hover::after, .nav a[aria-current]::after { transform: scaleX(1); }
 .lang { display: flex; border: 1px solid var(--line-2); }
 .lang button {
   min-width: 34px; padding: 5px 9px; border: 0; background: none; cursor: pointer;
@@ -212,8 +213,11 @@ section { scroll-margin-top: var(--head); }
 .hero-tag { margin: 0; max-width: 24em; font-size: clamp(20px, 1.6vw + 10px, 34px); line-height: 1.45; text-wrap: balance; }
 .hero-tag [lang="en"] { font-style: italic; font-size: 1.1em; }
 .hero-sub { margin: -6px 0 0; font-size: 14px; letter-spacing: .04em; color: var(--ash); }
+.cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; margin-top: 4px; }
+.cta-2 { font-size: 14px; letter-spacing: .04em; text-decoration: none; padding-bottom: 3px; border-bottom: 1px solid var(--line-2); transition: color .3s, border-color .3s; }
+.cta-2:hover { color: var(--signal); border-color: var(--signal); }
 .cta {
-  display: inline-flex; align-items: center; gap: 12px; margin-top: 4px; padding: 11px 18px 11px 15px;
+  display: inline-flex; align-items: center; gap: 12px; padding: 11px 18px 11px 15px;
   border: 1px solid var(--line-2); background: rgba(10, 10, 11, .5); text-decoration: none;
   font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase;
   -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); transition: border-color .3s, background-color .3s;
@@ -231,13 +235,10 @@ section { scroll-margin-top: var(--head); }
   content: ""; position: absolute; left: -2px; top: 0; width: 5px; height: 5px; border-radius: 50%;
   background: var(--signal); box-shadow: 0 0 8px var(--signal);
 }
-.avail { display: inline-flex; align-items: center; gap: 9px; color: var(--bone); }
-.avail i { width: 6px; height: 6px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 8px var(--glow); }
-.geo { margin-left: auto !important; }
 @media (max-width: 640px) {
   .name { flex-direction: column; align-items: flex-start; gap: .02em; font-size: 26.5vw; }
   .name .stamp { font-size: .3em; margin: 0 0 .12em .03em; }
-  .name .stamp small, .geo .coords, .hint { display: none; }
+  .name .stamp small, .hint { display: none; }
 }
 
 /* fingerprint core annotation */
@@ -457,6 +458,8 @@ section { scroll-margin-top: var(--head); }
   transition: color .3s, padding-left .45s cubic-bezier(.2, .8, .2, 1);
 }
 .links a:hover, .links a:focus-visible { color: var(--signal); padding-left: 14px; }
+.links a[data-todo] { color: var(--ash); cursor: default; }
+.links a[data-todo]:hover { color: var(--ash); padding-left: 0; }
 .go { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ash); }
 .go [lang] { font-family: var(--mono); }
 .loop {
@@ -515,7 +518,7 @@ section { scroll-margin-top: var(--head); }
 
 /* ---------- motion ---------- */
 .js:not(.is-ready) .hero-eyebrow, .js:not(.is-ready) .kanji > span, .js:not(.is-ready) .name .stamp,
-.js:not(.is-ready) .hero-tag, .js:not(.is-ready) .hero-sub, .js:not(.is-ready) .cta, .js:not(.is-ready) .hud,
+.js:not(.is-ready) .hero-tag, .js:not(.is-ready) .hero-sub, .js:not(.is-ready) .cta-row, .js:not(.is-ready) .hud,
 .js:not(.is-ready) .hero-foot, .js:not(.is-ready) .core { opacity: 0; }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -524,12 +527,12 @@ section { scroll-margin-top: var(--head); }
   .is-ready .name .stamp { animation: stampIn .55s cubic-bezier(.3, 1.45, .5, 1) 1.02s both; }
   .is-ready .hero-tag { animation: fadeUp .9s 1.45s both; }
   .is-ready .hero-sub { animation: fadeUp .9s 1.6s both; }
-  .is-ready .cta { animation: fadeUp .9s 1.75s both; }
+  .is-ready .cta-row { animation: fadeUp .9s 1.75s both; }
   .is-ready .hud { animation: fadeIn 1.2s .5s both; }
   .is-ready .hero-foot { animation: fadeIn 1s 1.9s both; }
   .is-ready .core { animation: fadeIn 1s 2s both; }
   .shake { animation: shake .38s linear; }
-  .rec, .live, .avail i { animation: blink 1.6s steps(1) infinite; }
+  .rec, .live { animation: blink 1.6s steps(1) infinite; }
   .cue-line::after { animation: drip 1.9s cubic-bezier(.6, 0, .3, 1) infinite; }
   .drop { animation: dropIn .45s cubic-bezier(.3, 1.5, .5, 1) both, dropOut .9s ease-in 1.7s forwards; }
   .screen.scan::after { animation: scanDown .7s cubic-bezier(.7, 0, .2, 1); }
@@ -537,9 +540,6 @@ section { scroll-margin-top: var(--head); }
   .pl.is-on { animation: kb 9s cubic-bezier(.2, .6, .2, 1) both; }
   .cap.is-on .ch { animation: chIn .7s cubic-bezier(.2, .9, .2, 1) both; animation-delay: calc(.12s + var(--k) * 42ms); }
   .step:hover .engr { animation: etch 1.4s linear infinite; }
-  @supports (animation-timeline: view()) {
-    .rv { animation: rv linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .drop { animation: dropOut .6s ease-in 1.2s forwards; }
@@ -583,7 +583,6 @@ section { scroll-margin-top: var(--head); }
   100% { opacity: 1; transform: none; filter: none; }
 }
 @keyframes etch { to { background-position: 0 12px; } }
-@keyframes rv { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
 </style>
 </head>
 <body>
@@ -646,13 +645,14 @@ section { scroll-margin-top: var(--head); }
         <span lang="ja">千葉で社会福祉を学ぶ、中国からの留学生。</span>
         <span lang="en">A student from China, studying social welfare in Chiba.</span>
       </p>
-      <a class="cta mono" href="#motion"><i class="cta-play" aria-hidden="true"></i><span class="t"><span lang="zh-CN">看 13 秒动态样片</span><span lang="ja">13秒の動くテストを見る</span><span lang="en">Watch the 13 s motion test</span></span></a>
+      <div class="cta-row">
+        <a class="cta mono" href="#motion"><i class="cta-play" aria-hidden="true"></i><span class="t"><span lang="zh-CN">看 13 秒动态样片</span><span lang="ja">13秒の動くテストを見る</span><span lang="en">Watch the 13 s motion test</span></span></a>
+        <a class="cta-2" href="#contact"><span class="t"><span lang="zh-CN">找我合作</span><span lang="ja">お仕事の相談</span><span lang="en">Work with me</span></span> →</a>
+      </div>
     </div>
     <div class="hero-foot mono">
       <a class="cue" href="#statement"><span class="cue-line" aria-hidden="true"></span><span class="t"><span lang="zh-CN">向下滚动</span><span lang="ja">スクロール</span><span lang="en">Scroll</span></span></a>
       <p class="hint t" aria-hidden="true"><span lang="zh-CN">点一下，盖个章</span><span lang="ja">タップ／クリックで押印</span><span lang="en">Tap or click to stamp</span></p>
-      <p class="avail"><i aria-hidden="true"></i><span class="t"><span lang="zh-CN">接受合作</span><span lang="ja">ご依頼受付中</span><span lang="en">Open for projects</span></span></p>
-      <p class="geo">CHIBA · JP<span class="coords"> — 35.61°N 140.11°E</span> — <span id="clock">--:--:--</span> JST</p>
     </div>
   </div>
 </section>
@@ -683,12 +683,12 @@ section { scroll-margin-top: var(--head); }
       <p class="sub mono">ROKU-BYŌ · SIX SECONDS · CODE MV</p>
     </div>
     <div class="work-text">
-      <p class="t rv">
+      <p class="t">
         <span lang="zh-CN">一首站在短视频这一边唱的歌。被窝里，一根拇指划走了一千个人，下一个轮到“我”。两秒就决定吗？连脸都不看吗？这支 MV 的每一帧都用代码渲染，指纹是 3D 雕版，每一条刻线就是一条指纹脊线。下面是制作中的第一批测试图版。</span>
         <span lang="ja">ショート動画の側から歌った一曲です。布団の中、親指ひとつで千人が流れていき、お次はわたし。二秒で決めるの？顔すら見ないの？このMVは全コマをコードでレンダリングします。指紋は3Dの版画で、刻線の一本一本がそのまま指紋の隆線になっています。下に並ぶのは、制作中の最初のテストプレートです。</span>
         <span lang="en">A song sung by a short video, to the thumb about to skip it. Under the covers, one thumb flicks past a thousand people, and I’m next. Two seconds to decide? Not even a look at my face? Every frame of the video is rendered in code. The fingerprint is a 3D engraving, and every cut line is a ridge. Below are the first test plates, still in production.</span>
       </p>
-      <dl class="spec mono rv">
+      <dl class="spec mono">
         <dt>FORMAT</dt>
         <dd class="t"><span lang="zh-CN">代码渲染的歌词 MV</span><span lang="ja">コードで描くリリックMV</span><span lang="en">Lyric video, rendered in code</span></dd>
         <dt>LENGTH</dt>
@@ -778,7 +778,7 @@ section { scroll-margin-top: var(--head); }
   <div class="motion wrap" id="motion" data-tl="PLATE I — MOTION TEST">
     <p class="eyebrow mono"><span>Motion test</span><span class="eyebrow-r">30 FPS · SILENT · CLOUD RENDER</span></p>
     <div class="reels">
-      <figure class="reel rv">
+      <figure class="reel">
         <div class="reel-screen">
           <video class="reel-v" poster="assets/ep36-thumb-poster.webp" width="1280" height="720" muted loop playsinline preload="none" aria-label="EP36 motion test: the thumb comes down and stops"><source src="assets/ep36-thumb.mp4" type="video/mp4"><source src="assets/ep36-thumb.webm" type="video/webm"></video>
           <button type="button" class="reel-btn" aria-label="Play or pause"><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9.5-5.5z"/></svg><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z"/></svg></button>
@@ -789,7 +789,7 @@ section { scroll-margin-top: var(--head); }
           <p class="reel-txt t"><span lang="zh-CN">拇指压下来，在离屏幕几毫米的地方急停。</span><span lang="ja">親指が近づき、画面の数ミリ手前でストップ。</span><span lang="en">The thumb comes down and stops a few millimetres from the glass.</span></p>
         </figcaption>
       </figure>
-      <figure class="reel rv">
+      <figure class="reel">
         <div class="reel-screen">
           <video class="reel-v" poster="assets/ep36-deep-poster.webp" width="1280" height="720" muted loop playsinline preload="none" aria-label="EP36 motion test: one lit screen among a million phones, then the loop"><source src="assets/ep36-deep.mp4" type="video/mp4"><source src="assets/ep36-deep.webm" type="video/webm"></video>
           <button type="button" class="reel-btn" aria-label="Play or pause"><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9.5-5.5z"/></svg><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z"/></svg></button>
@@ -814,25 +814,25 @@ section { scroll-margin-top: var(--head); }
       <span lang="en">Four steps from a song to a music video.</span>
     </h2>
     <ol class="steps">
-      <li class="step rv">
+      <li class="step">
         <div class="step-top mono"><b>01</b><span>VOICE</span></div>
         <span class="step-k engr" aria-hidden="true">声</span>
         <h3 class="t"><span lang="zh-CN">拆人声，对音拍</span><span lang="ja">声を分けて、拍を合わせる</span><span lang="en">Split and sync</span></h3>
         <p class="t"><span lang="zh-CN">把人声从歌里分离出来，按每一个音拍对齐歌词。字要在开口的那一帧落下。</span><span lang="ja">歌からボーカルを分離し、歌詞を一音ずつ合わせる。文字は、声が出るその一コマで落ちてくる。</span><span lang="en">Separate the vocal from the mix and align the lyrics syllable by syllable, so each character lands on the frame the voice begins.</span></p>
       </li>
-      <li class="step rv">
+      <li class="step">
         <div class="step-top mono"><b>02</b><span>TREATMENT</span></div>
         <span class="step-k engr" aria-hidden="true">描</span>
         <h3 class="t"><span lang="zh-CN">写分镜</span><span lang="ja">絵コンテを書く</span><span lang="en">Write the treatment</span></h3>
         <p class="t"><span lang="zh-CN">一句歌词一个新点子，每一场都有自己的画面母题。</span><span lang="ja">一行ごとに新しいアイデアを、一場面ごとにひとつのモチーフを。</span><span lang="en">A new idea for every line, and a motif for every scene.</span></p>
       </li>
-      <li class="step rv">
+      <li class="step">
         <div class="step-top mono"><b>03</b><span>ENGRAVE</span></div>
         <span class="step-k engr" aria-hidden="true">刻</span>
         <h3 class="t"><span lang="zh-CN">用代码刻出来</span><span lang="ja">コードで刻む</span><span lang="en">Engrave in code</span></h3>
         <p class="t"><span lang="zh-CN">和 AI 一起写渲染代码。3D 场景用光线步进计算，再用雕版线条一帧一帧画出来。</span><span lang="ja">AIと一緒にレンダリングのコードを書く。3Dはレイマーチングで計算し、版画の線で一コマずつ描く。</span><span lang="en">Write the renderer together with AI. The 3D is raymarched, then drawn in engraving lines, one frame at a time.</span></p>
       </li>
-      <li class="step rv">
+      <li class="step">
         <div class="step-top mono"><b>04</b><span>RELEASE</span></div>
         <span class="step-k engr" aria-hidden="true">放</span>
         <h3 class="t"><span lang="zh-CN">发布</span><span lang="ja">公開する</span><span lang="en">Release</span></h3>
@@ -846,7 +846,7 @@ section { scroll-margin-top: var(--head); }
 <section class="about" id="about" data-tl="PLATE III — SPECIMEN">
   <div class="about-grid wrap">
     <p class="eyebrow mono">Plate III — Specimen</p>
-    <aside class="card rv" aria-label="Profile">
+    <aside class="card" aria-label="Profile">
       <div class="card-top mono"><span>SPECIMEN No. 0,000,001</span><span class="live">● <span class="t"><span lang="zh-CN">播放中</span><span lang="ja">再生中</span><span lang="en">Now playing</span></span></span></div>
       <div class="card-fig">
         <p class="card-fig-l mono">FIG. A — <span lang="ja">魚</span></p>
@@ -871,7 +871,7 @@ section { scroll-margin-top: var(--head); }
         <dd class="t"><span lang="zh-CN">制作 EP36《六秒》</span><span lang="ja">EP36『六秒』を制作中</span><span lang="en">Making EP36 “Six Seconds”</span></dd>
       </dl>
     </aside>
-    <div class="about-text rv">
+    <div class="about-text">
       <h2 class="disp t">
         <span lang="zh-CN">白天学照顾人，晚上做 MV。</span>
         <span lang="ja">昼は福祉を学び、夜はMVを作る。</span>
@@ -992,12 +992,6 @@ section { scroll-margin-top: var(--head); }
     });
     return out;
   }
-
-  /* ---------- clock (JST) ---------- */
-  const clock = $('#clock');
-  const tickClock = () => { clock.textContent = new Date(Date.now() + 324e5).toISOString().slice(11, 19); };
-  tickClock();
-  setInterval(tickClock, 1000);
 
   /* ---------- hero: engraved fingerprint in WebGL ---------- */
   const VS = 'attribute vec2 aPos; void main() { gl_Position = vec4(aPos, 0.0, 1.0); }';
@@ -1391,6 +1385,7 @@ void main() {
   /* ---------- the page is six seconds long ---------- */
   const tl = $('#tl'), track = $('#track'), tc = $('#tc'), tlLabel = $('#tlLabel');
   const marks = $$('[data-tl]');
+  const navLinks = $$('.nav a');
   let label = '';
   const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - innerHeight);
   function updTL() {
@@ -1401,9 +1396,15 @@ void main() {
     track.setAttribute('aria-valuenow', s.toFixed(2));
     track.setAttribute('aria-valuetext', code);
     tl.classList.toggle('at-wall', p > 0.995);
-    let lab = marks[0].dataset.tl;
-    marks.forEach(m => { if (m.getBoundingClientRect().top < innerHeight * 0.5) lab = m.dataset.tl; });
-    if (lab !== label) { label = lab; scramble(tlLabel, lab); }
+    let at = marks[0];
+    marks.forEach(m => { if (m.getBoundingClientRect().top < innerHeight * 0.5) at = m; });
+    if (at.dataset.tl !== label) {
+      label = at.dataset.tl;
+      scramble(tlLabel, label);
+      // the nav marks the section being read (the motion test sits inside #work)
+      const here = '#' + at.closest('section').id;
+      navLinks.forEach(a => { if (a.getAttribute('href') === here) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+    }
   }
   let dragging = false;
   const seek = e => {
@@ -1493,7 +1494,7 @@ void main() {
     root.addEventListener('mouseleave', () => cursor.classList.add('off'));
     addEventListener('pointerover', e => {
       const el = e.target instanceof Element ? e.target : null;
-      const hot = !!(el && el.closest('a, button, [role="slider"]'));
+      const hot = !!(el && el.closest('a:not([data-todo]), button, [role="slider"]'));
       cursor.classList.toggle('hot', hot);
       cursor.classList.toggle('aim', !hot && !!(el && el.closest('#top')));
     });
